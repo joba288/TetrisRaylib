@@ -6,17 +6,15 @@
 #include "GameScene.h"
 
 
-int main(void)
+int main()
 {
+
     Core::ApplicationSpec appSpec = {"Tetris", 1080, 720};
     Core::Application application(appSpec);
+    application.GetSceneManager().PushScene<Tetris::MenuScene>();
+    application.GetSceneManager().PushScene<Tetris::GameScene>();
 
-    application.GetSceneManager().PushScene<MenuScene>();
-    application.GetSceneManager().PushScene<GameScene>();
+    application.GetSceneManager().GotoScene(1);
     
-
     application.Run();
-
-    
-
 }

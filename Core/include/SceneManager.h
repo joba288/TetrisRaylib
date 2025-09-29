@@ -11,6 +11,7 @@ namespace Core {
 		public:
 			virtual ~Scene() = default;
 
+			virtual void Init() {}
 			virtual void OnRender() {}
 			virtual void OnUpdate() {}
 

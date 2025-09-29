@@ -8,7 +8,7 @@ namespace Core
 
 	SceneManager::SceneManager()
 	{
-		
+
 	}
 
 	SceneManager::~SceneManager()
@@ -20,18 +20,20 @@ namespace Core
 	void SceneManager::NextScene()
 	{
 		m_CurrentScene = std::min(m_CurrentScene + 1, (int)m_Scenes.size());
+		m_Scenes[m_CurrentScene]->Init();
 	}
 
 	void SceneManager::PreviousScene()
 	{
 		m_CurrentScene = std::max(m_CurrentScene - 1, (int)m_Scenes.size());
+		m_Scenes[m_CurrentScene]->Init();
 	}
 
 	void SceneManager::GotoScene(int i)
 	{
 		m_CurrentScene = std::clamp(i, 0, (int)m_Scenes.size());
+		m_Scenes[m_CurrentScene]->Init();
 	}
-
 
 
 
