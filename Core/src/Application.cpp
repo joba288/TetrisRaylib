@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "SceneManager.h"
 #include <raylib.h>
 
 namespace Core
@@ -8,16 +9,21 @@ namespace Core
 
 	Application::Application(const ApplicationSpec& specification) : m_Specification(specification)
 	{
+		s_Application = this;
+
 		InitWindow(m_Specification.ScreenWidth, m_Specification.ScreenHeight, m_Specification.Name.c_str());
 		SetTargetFPS(60);
 
-		s_Application = this;
+		
+		
+		
 	
 	}
 	
 	Application::~Application()
 	{
 		CloseWindow();
+		s_Application = nullptr;
 	}
 
 	Application& Application::Get()
@@ -36,21 +42,16 @@ namespace Core
 			if (WindowShouldClose())
 			{
 				Stop();
+				break;
 			}
 
 
 			//Update
-
-
+			m_SceneManager.OnUpdate();
 			//Render
 			BeginDrawing();
-
-			ClearBackground(RAYWHITE);
-
+			m_SceneManager.OnRender();
 			EndDrawing();
-
-
-
 		
 		}
 	

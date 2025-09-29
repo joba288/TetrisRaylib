@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "SceneManager.h"
 
 namespace Core
 {
@@ -22,9 +23,16 @@ namespace Core
 
 			static Application& Get();
 
+			SceneManager& GetSceneManager() { return m_SceneManager; }
+			
+
 		private:
 			ApplicationSpec m_Specification;
 			bool m_Running = false;
+
+			SceneManager m_SceneManager;
+
+			
 
 
 	};
