@@ -36,7 +36,7 @@ namespace Tetris {
 
     }
 
-    void MenuScene::OnUpdate()
+    void MenuScene::OnUpdate(float ts)
     {
     }
 }

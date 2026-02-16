@@ -10,7 +10,7 @@ namespace Tetris {
 		
 		virtual void Init() override;
 		virtual void OnRender() override;
-		virtual void OnUpdate() override;
+		virtual void OnUpdate(float ts) override;
 
 
 	};

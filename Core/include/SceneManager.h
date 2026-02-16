@@ -13,7 +13,7 @@ namespace Core {
 
 			virtual void Init() {}
 			virtual void OnRender() {}
-			virtual void OnUpdate() {}
+			virtual void OnUpdate(float ts) {}
 
 	};
 
@@ -30,7 +30,7 @@ namespace Core {
 			void GotoScene(int i);
 
 			void OnRender();
-			void OnUpdate();
+			void OnUpdate(float ts);
 
 			template<typename TScene>
 			requires(std::is_base_of_v<Scene, TScene>)
@@ -42,6 +42,8 @@ namespace Core {
 		private:
 			int m_CurrentScene = 0;
 			std::vector<std::unique_ptr<Scene>> m_Scenes;
+			
+			
 			
 	
 	

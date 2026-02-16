@@ -37,10 +37,10 @@ namespace Core
 
 
 
-	void SceneManager::OnUpdate()
+	void SceneManager::OnUpdate(float ts)
 	{
 		if (m_Scenes.size() > 0)
-			m_Scenes[m_CurrentScene]->OnUpdate();
+			m_Scenes[m_CurrentScene]->OnUpdate(ts);
 	}
 
 	void SceneManager::OnRender()

@@ -21,6 +21,14 @@ namespace Core
 			void Run();
 			void Stop();
 
+			// Scene Manager
+			void NextScene();
+			void PreviousScene();
+			void GotoScene(int i);
+
+
+			ApplicationSpec GetSpec() { return m_Specification; };
+
 			static Application& Get();
 
 			SceneManager& GetSceneManager() { return m_SceneManager; }

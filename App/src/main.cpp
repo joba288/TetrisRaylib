@@ -14,7 +14,6 @@ int main()
     application.GetSceneManager().PushScene<Tetris::MenuScene>();
     application.GetSceneManager().PushScene<Tetris::GameScene>();
 
-    application.GetSceneManager().GotoScene(1);
-    
+    application.GotoScene(1);
     application.Run();
 }
