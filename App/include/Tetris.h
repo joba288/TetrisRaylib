@@ -5,17 +5,18 @@
 #include <random>
 #include <iostream>
 #include <algorithm>
+#include <cassert>
 
 // TODO:
 //
 //  GAMEPLAY
 // - Death - lose condition
 // - Speeding up of interval - difficulty
-// - Clean up code
+// - Clean up code - make code specific to tetris.h rahyhghdgh etc
 // - Saving Tetronimos
-// - View upcoming tetronimos
 // - Points
-// - Pause Button
+// - Pause Menu
+// - Rotate fix bug
 // - 
 // 
 // POLISH
@@ -26,6 +27,7 @@
 // - SFX
 // - Shaders
 // - Animation
+// - trail when quick place
 // 
 // SYSTEMS
 // - AssetManager
@@ -34,7 +36,8 @@
 // - Shaders
 // 
 // OPENGL PORT
-//
+// FIX CMAKE - MAKE IT BUILD ON ANY SYSTEM
+
 
 
 namespace Tetris
@@ -43,6 +46,10 @@ namespace Tetris
 	constexpr int GRID_WIDTH = 10;
 	constexpr int GRID_HEIGHT = 20;
 
+	constexpr int GRID_INDEX(int x, int y) 
+	{
+		return y * GRID_WIDTH + x;
+	}
 
 	constexpr enum TETRONIMO
 	{
@@ -56,28 +63,42 @@ namespace Tetris
 
 	};
 
+	constexpr int TETRONIMO_INDEX(int i, int rotation, int x, int y)
+	{
+		return (((i - 1) * 4 + rotation) * 16 + (y * 4 + x));
+	}
+
 	struct Tetris
 	{
 		std::array<int, (GRID_WIDTH) * (GRID_HEIGHT)> grid = {0}; 
+		Vector2 gridPos = { 0,0 }; // point on screen
 
-		Vector2 gridPos = { 0,0 };
-		int score = 0;
+
+		int& gridGetSquare(int x, int y)
+		{
+			return grid[GRID_INDEX(x, y)];
+		}
+		// maybe id do getters and setters for this to be safe
+		int& gridGetSquare(Vector2 pos){ return grid[GRID_INDEX((int)pos.x, (int)pos.y)]; }
+
+
+		unsigned int score = 0;
 
 		TETRONIMO currentTetronimo = IBlock;
 		int currentRotation = 0;
 		Vector2 currentPos = {3, 0};
 
+		std::array<TETRONIMO, 3> upcomingTetronimos = { TETRONIMO(rand() % (7) + 1 ),
+														TETRONIMO(rand() % (7) + 1) ,
+														TETRONIMO(rand() % (7) + 1) };
+		unsigned int currentTetronimoIndex = 0;
+
+		TETRONIMO savedTetronimo = TETRONIMO(0);
+
 		float tickTimer = 0.f;
 		float tickInterval = 0.3f;
 
 		std::array<Color, 8> colors = {LIGHTGRAY, SKYBLUE, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED};
-
-
-
-		int index(Vector2 i)
-		{
-			return (int)i.y * GRID_WIDTH + (int)i.x;
-		}
 
 
 		bool checkCollision(Vector2 pos) // temporary needs cleaning up
@@ -114,11 +135,11 @@ namespace Tetris
 			{
 				for (int x = 0; x < 4; x++)
 				{
-					int currentSquare = tetronimos[((currentTetronimo-1) * 4 + currentRotation) * 16 + (y * 4 + x)];
+					int currentSquare = tetronimos[TETRONIMO_INDEX(currentTetronimo, currentRotation, x, y)];
 					Vector2 gridPos = { x + currentPos.x, y + currentPos.y };
 					if (currentSquare != 0)
 					{
-						grid[index(gridPos)] = currentSquare;
+						gridGetSquare(gridPos) = currentSquare;
 					}
 				}
 			}
@@ -128,7 +149,11 @@ namespace Tetris
 
 			currentPos = { 3, 0 };
 			currentRotation = 0;
-			currentTetronimo = TETRONIMO( rand() % (7)+1);
+
+			currentTetronimoIndex = ((currentTetronimoIndex + 1) % 3);				   //   increment index position for the next tetronimo
+			currentTetronimo = upcomingTetronimos[currentTetronimoIndex]; //			 set the next tetronimo as current
+			upcomingTetronimos[currentTetronimoIndex] = TETRONIMO(rand() % (7) + 1); //	 get new random tetronimo
+		
 
 		}
 
@@ -159,7 +184,7 @@ namespace Tetris
 				for (int x = 0; x < GRID_WIDTH; x++)
 				{
 
-					int currentSquare = (grid[y * GRID_WIDTH + x]);
+					int currentSquare = gridGetSquare(x, y);
 					if (currentSquare == 0)
 					{
 						emptyCount++;
@@ -175,16 +200,16 @@ namespace Tetris
 			// set lines to 0
 			for (int i = 0; i < fullLines.size(); i++)
 			{
+				score++;
 				for (int x = 0; x < GRID_WIDTH; x++)
 				{
-
-					grid[index(Vector2{ (float)x, (float)fullLines[i] })] = 0;
+					gridGetSquare(x, fullLines[i]) = 0;
 				}
 			}
 			// move lines down
 			//	make new grid and skip over full lines
 			std::array<int, (GRID_WIDTH) * (GRID_HEIGHT)> newGrid = { 0 };
-			int newGrid_y = GRID_HEIGHT-1;
+			int newGrid_y = GRID_HEIGHT - 1;
 			for (int y = GRID_HEIGHT-1; y > 0; y--)
 			{
 				bool emptyLine = 0;
@@ -192,20 +217,16 @@ namespace Tetris
 				if (!emptyLine) {
 					for (int x = 0; x < GRID_WIDTH; x++)
 					{
+						newGrid[GRID_INDEX(x, newGrid_y)] = gridGetSquare(x, y);
 
-						newGrid[index(Vector2((float)x, (float)newGrid_y))] = grid[index(Vector2((float)x, (float)y))];
+
 					}
 					newGrid_y--;
 				}
 				
 			}
-
 			grid = newGrid; // change this to only be if any empty
-
-
 		}
-
-		
 	};
 
 

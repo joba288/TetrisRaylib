@@ -17,17 +17,16 @@ namespace Tetris
 
 	void GameScene::OnRender()
 	{
-		
+
 		int screenWidth = Core::Application::Get().GetSpec().ScreenWidth;
 		int screenHeight = Core::Application::Get().GetSpec().ScreenHeight;
-
 
 		ClearBackground(RAYWHITE);
 
 		// Temp
-		
-		m_Camera.offset = { screenWidth / 2.0f, screenHeight / 2.0f } ;
-		m_Camera.target = {m_Tetris.gridPos.x + (GRID_WIDTH*SQUARE_SIZE)/2, m_Tetris.gridPos.y + (GRID_HEIGHT*SQUARE_SIZE)/2};
+
+		m_Camera.offset = { screenWidth / 2.0f, screenHeight / 2.0f };
+		m_Camera.target = { m_Tetris.gridPos.x + (GRID_WIDTH * SQUARE_SIZE) / 2, m_Tetris.gridPos.y + (GRID_HEIGHT * SQUARE_SIZE) / 2 };
 		m_Camera.rotation = 0.0f;
 		m_Camera.zoom = 1.0f;
 		//
@@ -39,40 +38,62 @@ namespace Tetris
 			for (int x = 0; x < GRID_WIDTH; x++)
 			{
 
-				int currentSquare = (m_Tetris.grid[y * GRID_WIDTH + x]);
+				int currentSquare = m_Tetris.gridGetSquare(x, y);
 				DrawRectangle(x * SQUARE_SIZE, y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, m_Tetris.colors[currentSquare]);
 			}
-		}
+		}// need function draw tetronimo, draw grid
 
 		// Draw Current Tetronimo
 		Vector2 landingPos = m_Tetris.getLandingPosition();
-		
 
 		for (int y = 0; y < 4; y++)
 		{
 			for (int x = 0; x < 4; x++)
 			{
-				int currentSquare = tetronimos[((m_Tetris.currentTetronimo-1) * 4 + m_Tetris.currentRotation) * 16 + (y * 4 + x)]; // look into cleaning this
+				int currentSquare = tetronimos[TETRONIMO_INDEX(m_Tetris.currentTetronimo, m_Tetris.currentRotation, x, y)]; // look into cleaning this
 
 				if (currentSquare != 0)
 				{
 					DrawRectangle(x * SQUARE_SIZE + m_Tetris.currentPos.x * SQUARE_SIZE, y * SQUARE_SIZE + m_Tetris.currentPos.y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, m_Tetris.colors[currentSquare]);
 					Color c = m_Tetris.colors[currentSquare];
-					DrawRectangle(x * SQUARE_SIZE + landingPos.x * SQUARE_SIZE, y * SQUARE_SIZE + landingPos.y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, Color{c.r, c.g, c.b, 125});
-					
+					DrawRectangle(x * SQUARE_SIZE + landingPos.x * SQUARE_SIZE, y * SQUARE_SIZE + landingPos.y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, Color{ c.r, c.g, c.b, 125 });
+
 				}
 
-				
+
 
 
 
 			}
 		}
+		TETRONIMO t = m_Tetris.upcomingTetronimos[(m_Tetris.currentTetronimoIndex + 1) % 3];
+		for (int y = 0; y < 4; y++)
+		{
+			for (int x = 0; x < 4; x++)
+			{
+				
+				int currentSquare = tetronimos[TETRONIMO_INDEX(t, m_Tetris.currentRotation, x, y)]; // look into cleaning this
+				DrawRectangle(x * SQUARE_SIZE + 11.0f * SQUARE_SIZE, y * SQUARE_SIZE + 0.0f * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, m_Tetris.colors[currentSquare]);
+				// fix hard coded values
+			}
+		}
 
+		t = m_Tetris.upcomingTetronimos[(m_Tetris.currentTetronimoIndex + 2) % 3];
+		for (int y = 0; y < 4; y++)
+		{
+			for (int x = 0; x < 4; x++)
+			{
+
+				int currentSquare = tetronimos[TETRONIMO_INDEX(t, m_Tetris.currentRotation, x, y)]; // look into cleaning this
+				DrawRectangle(x * SQUARE_SIZE/2 + 32.0f * SQUARE_SIZE/2, y * SQUARE_SIZE/2 + 0.0f * SQUARE_SIZE/2, SQUARE_SIZE/2, SQUARE_SIZE/2, m_Tetris.colors[currentSquare]);
+				// fix hard coded values
+			}
+		}
+		
 		EndMode2D();
 
 		//GUI
-
+		DrawText(std::to_string(m_Tetris.score).c_str(), 20, 10, 80, BLACK);
 
 
 	}
