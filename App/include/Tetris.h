@@ -25,7 +25,7 @@
 // - Textures
 // - Music
 // - SFX
-// - Shaders
+// - Shaders - screen space shadows, tetronimo depth
 // - Animation
 // - trail when quick place
 // 
@@ -73,6 +73,11 @@ namespace Tetris
 		std::array<int, (GRID_WIDTH) * (GRID_HEIGHT)> grid = {0}; 
 		Vector2 gridPos = { 0,0 }; // point on screen
 
+		std::array<float, (GRID_WIDTH* GRID_HEIGHT)> gridDepth;
+
+		
+		
+		
 
 		int& gridGetSquare(int x, int y)
 		{
@@ -87,6 +92,7 @@ namespace Tetris
 		TETRONIMO currentTetronimo = IBlock;
 		int currentRotation = 0;
 		Vector2 currentPos = {3, 0};
+		float currentDepth = 2.0f;
 
 		std::array<TETRONIMO, 3> upcomingTetronimos = { TETRONIMO(rand() % (7) + 1 ),
 														TETRONIMO(rand() % (7) + 1) ,
@@ -140,6 +146,7 @@ namespace Tetris
 					if (currentSquare != 0)
 					{
 						gridGetSquare(gridPos) = currentSquare;
+						gridDepth[GRID_INDEX(gridPos.x, gridPos.y)] = currentDepth;
 					}
 				}
 			}
@@ -149,7 +156,8 @@ namespace Tetris
 
 			currentPos = { 3, 0 };
 			currentRotation = 0;
-
+			currentDepth = (rand() % 64 + 2) / 2;
+			//currentDepth = 2.0f;
 			currentTetronimoIndex = ((currentTetronimoIndex + 1) % 3);				   //   increment index position for the next tetronimo
 			currentTetronimo = upcomingTetronimos[currentTetronimoIndex]; //			 set the next tetronimo as current
 			upcomingTetronimos[currentTetronimoIndex] = TETRONIMO(rand() % (7) + 1); //	 get new random tetronimo
@@ -198,9 +206,10 @@ namespace Tetris
 			}
 
 			// set lines to 0
+
 			for (int i = 0; i < fullLines.size(); i++)
 			{
-				score++;
+				score+=fullLines.size();
 				for (int x = 0; x < GRID_WIDTH; x++)
 				{
 					gridGetSquare(x, fullLines[i]) = 0;
@@ -209,6 +218,11 @@ namespace Tetris
 			// move lines down
 			//	make new grid and skip over full lines
 			std::array<int, (GRID_WIDTH) * (GRID_HEIGHT)> newGrid = { 0 };
+			std::array<float, (GRID_WIDTH)* (GRID_HEIGHT)> newGridDepth;
+			for (int i = 0; i < 200; ++i) {
+				newGridDepth[i] = 0.0f;
+			}
+			//std::fill_n(newGridDepth, GRID_WIDTH*GRID_HEIGHT, 5.0f);
 			int newGrid_y = GRID_HEIGHT - 1;
 			for (int y = GRID_HEIGHT-1; y > 0; y--)
 			{
@@ -217,7 +231,8 @@ namespace Tetris
 				if (!emptyLine) {
 					for (int x = 0; x < GRID_WIDTH; x++)
 					{
-						newGrid[GRID_INDEX(x, newGrid_y)] = gridGetSquare(x, y);
+						newGrid[GRID_INDEX(x, newGrid_y)] = gridGetSquare(x, y); // i dont think this needs to be 2 for loops
+						newGridDepth[GRID_INDEX(x, newGrid_y)] = gridDepth[GRID_INDEX(x,y)];
 
 
 					}
@@ -226,6 +241,7 @@ namespace Tetris
 				
 			}
 			grid = newGrid; // change this to only be if any empty
+			gridDepth = newGridDepth;
 		}
 	};
 

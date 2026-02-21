@@ -5,13 +5,19 @@
 #include <format>
 #include "Application.h"
 #include <iostream>
+#include <array>
 
 namespace Tetris
 {
 
+
+
 	void GameScene::Init()
 	{
-		
+		for (int i = 0; i < 200; ++i) {
+			m_Tetris.gridDepth[i] = 0.0f;
+		}
+
 
 	}
 
@@ -29,9 +35,60 @@ namespace Tetris
 		m_Camera.target = { m_Tetris.gridPos.x + (GRID_WIDTH * SQUARE_SIZE) / 2, m_Tetris.gridPos.y + (GRID_HEIGHT * SQUARE_SIZE) / 2 };
 		m_Camera.rotation = 0.0f;
 		m_Camera.zoom = 1.0f;
+
+
 		//
+		std::array<float, GRID_WIDTH* GRID_HEIGHT> gridAndCurrentDepth;
+		for (int y = 0; y < GRID_HEIGHT; y++)
+		{
+			for (int x = 0; x < GRID_WIDTH; x++)
+			{
+				gridAndCurrentDepth[GRID_INDEX(x,y)] = m_Tetris.gridDepth[GRID_INDEX(x, y)];
+			}
+		}
+
+		for (int y = 0; y < 4; y++)
+		{
+			for (int x = 0; x < 4; x++)
+			{
+				int currentSquare = tetronimos[TETRONIMO_INDEX(m_Tetris.currentTetronimo, m_Tetris.currentRotation, x, y)]; // look into cleaning this
+
+				if (currentSquare != 0)
+				{
+					gridAndCurrentDepth[GRID_INDEX(x + m_Tetris.currentPos.x, y + m_Tetris.currentPos.y)] = m_Tetris.currentDepth;
+
+
+				}
+
+			}
+		}
+
+
+
+
+
+		int depthGridLoc = GetShaderLocation(lightingShader, "depthGrid");
+		SetShaderValueV(lightingShader, depthGridLoc, &gridAndCurrentDepth, SHADER_UNIFORM_FLOAT, 200);
+		int screenSizeLoc = GetShaderLocation(lightingShader, "windowSize");
+		float screenSize[2] = { screenWidth, screenHeight };
+		SetShaderValue(lightingShader, screenSizeLoc, &screenSize, SHADER_UNIFORM_VEC2);
+
+		int lightPosLoc = GetShaderLocation(lightingShader, "lightPos");
+		float mouseUV[2] = {GetMouseX()-screenWidth/2.0, GetMouseY()};
+		SetShaderValue(lightingShader, lightPosLoc, &mouseUV, SHADER_UNIFORM_VEC2);
+
+		int squareSizeLoc = GetShaderLocation(lightingShader, "squareSize");
+		int squareSize = 32;
+		SetShaderValue(lightingShader, squareSizeLoc, &squareSize, SHADER_UNIFORM_INT);
+
+		int gridSizeLoc = GetShaderLocation(lightingShader, "gridSize");
+		unsigned int gridSize[2] = {GRID_WIDTH, GRID_HEIGHT};
+		SetShaderValue(lightingShader, gridSizeLoc, &gridSize, SHADER_UNIFORM_IVEC2);
 
 		BeginMode2D(m_Camera);
+
+		BeginShaderMode(lightingShader);
+
 		// Draw Grid
 		for (int y = 0; y < GRID_HEIGHT; y++)
 		{
@@ -42,7 +99,7 @@ namespace Tetris
 				DrawRectangle(x * SQUARE_SIZE, y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, m_Tetris.colors[currentSquare]);
 			}
 		}// need function draw tetronimo, draw grid
-
+		
 		// Draw Current Tetronimo
 		Vector2 landingPos = m_Tetris.getLandingPosition();
 
@@ -66,13 +123,17 @@ namespace Tetris
 
 			}
 		}
+
+		EndShaderMode();
+
+
 		TETRONIMO t = m_Tetris.upcomingTetronimos[(m_Tetris.currentTetronimoIndex + 1) % 3];
 		for (int y = 0; y < 4; y++)
 		{
 			for (int x = 0; x < 4; x++)
 			{
 				
-				int currentSquare = tetronimos[TETRONIMO_INDEX(t, m_Tetris.currentRotation, x, y)]; // look into cleaning this
+				int currentSquare = tetronimos[TETRONIMO_INDEX(t, 1, x, y)]; // look into cleaning this
 				DrawRectangle(x * SQUARE_SIZE + 11.0f * SQUARE_SIZE, y * SQUARE_SIZE + 0.0f * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, m_Tetris.colors[currentSquare]);
 				// fix hard coded values
 			}
@@ -84,7 +145,7 @@ namespace Tetris
 			for (int x = 0; x < 4; x++)
 			{
 
-				int currentSquare = tetronimos[TETRONIMO_INDEX(t, m_Tetris.currentRotation, x, y)]; // look into cleaning this
+				int currentSquare = tetronimos[TETRONIMO_INDEX(t, 1, x, y)]; // look into cleaning this
 				DrawRectangle(x * SQUARE_SIZE/2 + 32.0f * SQUARE_SIZE/2, y * SQUARE_SIZE/2 + 0.0f * SQUARE_SIZE/2, SQUARE_SIZE/2, SQUARE_SIZE/2, m_Tetris.colors[currentSquare]);
 				// fix hard coded values
 			}

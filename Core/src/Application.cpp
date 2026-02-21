@@ -76,6 +76,7 @@ namespace Core
 	void Application::GotoScene(int i)
 	{
 		m_SceneManager.GotoScene(i);
+		
 	}
 
 }
