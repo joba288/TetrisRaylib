@@ -1,7 +1,8 @@
 #pragma once
 
 #include <string>
-#include "SceneManager.h"
+#include <SceneManager.h>
+#include <Event.h>
 
 namespace Core
 {
@@ -26,6 +27,8 @@ namespace Core
 			void PreviousScene();
 			void GotoScene(int i);
 
+			
+
 
 			ApplicationSpec GetSpec() { return m_Specification; };
 
@@ -39,6 +42,8 @@ namespace Core
 			bool m_Running = false;
 
 			SceneManager m_SceneManager;
+
+			
 
 			
 

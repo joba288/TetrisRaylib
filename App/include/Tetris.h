@@ -6,6 +6,12 @@
 #include <iostream>
 #include <algorithm>
 #include <cassert>
+#include <string>
+
+#include <RendererAdapter.h> // from Core
+
+// make it dependent from raylib
+
 
 // TODO:
 //
@@ -105,6 +111,170 @@ namespace Tetris
 		float tickInterval = 0.3f;
 
 		std::array<Color, 8> colors = {LIGHTGRAY, SKYBLUE, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED};
+
+	
+		// INPUT FUNCTIONS
+
+		void onInputRotatePressed()
+		{
+			int previousRotation = currentRotation;
+			currentRotation += 1;
+			currentRotation %= 4;
+			if (checkCollision(currentPos))
+				currentRotation = previousRotation;
+		}
+		void onInputLeftPressed() 
+		{
+			if (!checkCollision({ currentPos.x - 1, currentPos.y }))
+			{
+				currentPos.x -= 1;
+			}
+		}
+		void onInputRightPressed() 
+		{
+			if (!checkCollision({ currentPos.x + 1, currentPos.y }))
+			{
+				currentPos.x += 1;
+			}
+		}
+		void onInputSpeedPlacePressed() 
+		{
+			currentPos = getLandingPosition();
+		}
+		void onInputSaveTetronimoPressed() {}
+		void Tick(float ts) 
+		{
+			tickTimer += ts;
+			if (tickTimer > tickInterval)
+			{
+				tickTimer = 0.f;
+				if (checkCollision({ currentPos.x, currentPos.y + 1 }))
+				{
+					placeCurrentTetronimo();
+				}
+				else
+				{
+					currentPos.y += 1;
+				}
+			}
+		}
+		
+
+		//
+
+
+
+
+
+
+
+
+		void combineGridTetronimoDepth(std::array<float, (GRID_WIDTH*GRID_HEIGHT)>& g)
+		{
+
+			for (int y = 0; y < 4; y++)
+			{
+				for (int x = 0; x < 4; x++)
+				{
+					int currentSquare = tetronimos[TETRONIMO_INDEX(currentTetronimo, currentRotation, x, y)]; // look into cleaning this
+
+					if (currentSquare != 0)
+					{
+						g[GRID_INDEX(x + currentPos.x, y + currentPos.y)] = currentDepth;
+
+
+					}
+
+				}
+			}
+
+		}
+
+
+
+
+
+
+		void drawGrid(Core::RendererAdapter& r)
+		{
+			for (int y = 0; y < GRID_HEIGHT; y++)
+			{
+				for (int x = 0; x < GRID_WIDTH; x++)
+				{
+
+					int currentSquare = gridGetSquare(x, y);
+					Color c = colors[currentSquare]; // Replace color
+					r.drawRectangle(x * SQUARE_SIZE, y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, c.r, c.g, c.b, c.a);
+				}
+			}
+		}
+
+		//drawTetronimo
+
+		void drawCurrentTetronimo(Core::RendererAdapter& r)
+		{
+			// Draws the current tetronimo at its grid position, as well as the place where it will land
+			Vector2 landingPos = getLandingPosition();
+
+			for (int y = 0; y < 4; y++)
+			{
+				for (int x = 0; x < 4; x++)
+				{
+					int currentSquare = tetronimos[TETRONIMO_INDEX(currentTetronimo, currentRotation, x, y)]; 
+
+					if (currentSquare != 0)
+					{
+						Color c = colors[currentSquare];
+						r.drawRectangle(x * SQUARE_SIZE + currentPos.x * SQUARE_SIZE, y * SQUARE_SIZE + currentPos.y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, c.r, c.g, c.b, c.a);
+						r.drawRectangle(x * SQUARE_SIZE + landingPos.x * SQUARE_SIZE, y * SQUARE_SIZE + landingPos.y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, c.r, c.g, c.b, 125 );
+					}
+				}
+			}
+
+		}
+
+		void drawUpcomingTetronimos(Core::RendererAdapter& r) // optimise
+		{
+			TETRONIMO t = upcomingTetronimos[(currentTetronimoIndex + 1) % 3];
+			for (int y = 0; y < 4; y++)
+			{
+				for (int x = 0; x < 4; x++)
+				{
+
+					int currentSquare = tetronimos[TETRONIMO_INDEX(t, 1, x, y)]; // look into cleaning this
+					if (currentSquare != 0)
+					{
+						Color c = colors[currentSquare];
+						r.drawRectangle(x * SQUARE_SIZE + 11.0f * SQUARE_SIZE, y * SQUARE_SIZE + 0.0f * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, c.r, c.g, c.b, c.a);
+						// fix hard coded values
+					}
+				}
+			}
+
+			t = upcomingTetronimos[(currentTetronimoIndex + 2) % 3];
+			for (int y = 0; y < 4; y++)
+			{
+				for (int x = 0; x < 4; x++)
+				{
+
+					int currentSquare = tetronimos[TETRONIMO_INDEX(t, 1, x, y)]; // look into cleaning this
+					Color c = colors[currentSquare];
+					r.drawRectangle(x * SQUARE_SIZE / 2 + 32.0f * SQUARE_SIZE / 2, y * SQUARE_SIZE / 2 + 0.0f * SQUARE_SIZE / 2, SQUARE_SIZE / 2, SQUARE_SIZE / 2, c.r, c.g, c.b, c.a);
+					// fix hard coded values
+				}
+			}
+		}
+
+		
+		
+		void drawScore(Core::RendererAdapter& r)
+		{
+			r.drawText(std::to_string(score).c_str(), 20, 10, 80, 0, 0, 0, 255);
+		}
+
+
+
+
 
 
 		bool checkCollision(Vector2 pos) // temporary needs cleaning up
@@ -222,7 +392,7 @@ namespace Tetris
 			for (int i = 0; i < 200; ++i) {
 				newGridDepth[i] = 0.0f;
 			}
-			//std::fill_n(newGridDepth, GRID_WIDTH*GRID_HEIGHT, 5.0f);
+
 			int newGrid_y = GRID_HEIGHT - 1;
 			for (int y = GRID_HEIGHT-1; y > 0; y--)
 			{

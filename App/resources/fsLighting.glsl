@@ -1,4 +1,5 @@
 #version 330
+// HEADER TO BE INJECTED
 
 // constants
 const float stepSize = 2.0;
@@ -20,7 +21,7 @@ out vec4 finalColor;
 
 
 // need to pass in the depth grid
-uniform float depthGrid[10*20];
+uniform float depthGrid[GRID_WIDTH * GRID_HEIGHT]; // INJECTED VALUES
 uniform vec2 windowSize;
 uniform vec2 lightPos;
 uniform int squareSize;
@@ -31,7 +32,7 @@ uniform ivec2 gridSize;
 
 float index(ivec2 pos)
 {
-    return depthGrid[int(pos.y) * gridSize.x + int(pos.x)];
+    return depthGrid[int(pos.y) * GRID_WIDTH + int(pos.x)];
 }
 
 

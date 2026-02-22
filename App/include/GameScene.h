@@ -1,6 +1,7 @@
 #pragma once
 #include "SceneManager.h"
 #include "Tetris.h"
+#include "RaylibRenderer.h"
 
 namespace Tetris {
 	class GameScene : public Core::Scene
@@ -16,7 +17,9 @@ namespace Tetris {
 	private:
 		Tetris m_Tetris;
 		Camera2D m_Camera = { 0 };
-		Shader lightingShader = LoadShader(TextFormat("resources/vsLighting.glsl", 330),
-			TextFormat("resources/fsLighting.glsl", 330)); // fix
+		Shader lightingShader;
+
+		RaylibRenderer renderer;
+
 	};
 }
