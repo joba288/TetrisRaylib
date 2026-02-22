@@ -2,7 +2,7 @@
 
 #include <string>
 #include <SceneManager.h>
-#include <Event.h>
+
 
 namespace Core
 {

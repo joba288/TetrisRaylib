@@ -15,9 +15,7 @@ namespace Tetris
 
 	void GameScene::Init()
 	{
-		for (int i = 0; i < 200; ++i) {
-			m_Tetris.gridDepth[i] = 0.0f;
-		} // fix with grid.h
+		m_Tetris.grid.initDepthGrid(); 
 
 		// INJECT SHADER HEADER
 		char* vsRaw = LoadFileText("resources/vsLighting.glsl");
@@ -56,13 +54,13 @@ namespace Tetris
 		// Temp
 
 		m_Camera.offset = { screenWidth / 2.0f, screenHeight / 2.0f };
-		m_Camera.target = { m_Tetris.gridPos.x + (GRID_WIDTH * SQUARE_SIZE) / 2, m_Tetris.gridPos.y + (GRID_HEIGHT * SQUARE_SIZE) / 2 };
+		m_Camera.target = { m_Tetris.grid.pos.x + (GRID_WIDTH * SQUARE_SIZE) / 2, m_Tetris.grid.pos.y + (GRID_HEIGHT * SQUARE_SIZE) / 2 };
 		m_Camera.rotation = 0.0f;
 		m_Camera.zoom = 1.0f;
 
 		// TODO Cleanup shader setup
 #pragma region Shader Uniform Setup
-		std::array<float, GRID_WIDTH* GRID_HEIGHT> gridAndCurrentDepth = m_Tetris.gridDepth;
+		std::array<float, GRID_WIDTH* GRID_HEIGHT> gridAndCurrentDepth;
 		m_Tetris.combineGridTetronimoDepth(gridAndCurrentDepth);
 		int depthGridLoc = GetShaderLocation(lightingShader, "depthGrid");
 		SetShaderValueV(lightingShader, depthGridLoc, &gridAndCurrentDepth, SHADER_UNIFORM_FLOAT, GRID_WIDTH*GRID_HEIGHT);
@@ -95,6 +93,7 @@ namespace Tetris
 	}
 	void GameScene::OnUpdate(float ts)
 	{
+
 		m_Tetris.Tick(ts);
 
 		if (IsKeyPressed(KEY_UP))
