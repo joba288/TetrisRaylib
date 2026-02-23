@@ -245,13 +245,13 @@ namespace Tetris
 				{
 
 					int currentSquare = tetronimos[TETRONIMO_INDEX(t, 1, x, y)];
-					if (currentSquare != 0)
-					{
+					//if (currentSquare != 0)
+					//{
 						Color c = colors[currentSquare];
 						r.drawRectangle(x * sSize + posX * sSize,
 							y * sSize + posY * sSize, sSize,
 							sSize, c.r, c.g, c.b, c.a); // TODO Fix Scaling
-					}
+					//}
 				}
 			}
 		}

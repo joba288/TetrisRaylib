@@ -18,6 +18,8 @@ namespace Tetris {
 		Tetris m_Tetris;
 		Camera2D m_Camera = { 0 };
 		Shader lightingShader;
+		Shader spinShader;
+		float time = 0.f;
 
 		RaylibRenderer renderer;
 

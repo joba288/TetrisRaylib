@@ -41,6 +41,11 @@ namespace Tetris
 		lightingShader = LoadShaderFromMemory(vsLighting.c_str(), fsLighting.c_str());
 
 
+
+
+		spinShader = LoadShader("resources/vsSpin.glsl", "resources/fsBase.glsl");
+
+
 	}
 	void GameScene::OnRender()
 	{
@@ -77,15 +82,36 @@ namespace Tetris
 		SetShaderValue(lightingShader, gridSizeLoc, &gridSize, SHADER_UNIFORM_IVEC2);
 #pragma endregion
 
+		time += GetFrameTime();
+		int tLoc = GetShaderLocation(spinShader, "t");
+		SetShaderValue(spinShader, tLoc, &time, SHADER_UNIFORM_FLOAT);
+		int centreLoc = GetShaderLocation(spinShader, "centre");
+
 		BeginMode2D(m_Camera);
 		BeginShaderMode(lightingShader);
 
 		m_Tetris.drawGrid(renderer);
 		m_Tetris.drawCurrentTetronimo(renderer);
+
+		Texture2D tex = LoadTextureFromImage(LoadImage("resources/squareTexture.jpg"));
+		DrawTexture(tex, m_Tetris.currentPos.x*squareSize, m_Tetris.currentPos.y*squareSize, m_Tetris.colors[m_Tetris.currentTetronimo]);
+
 		EndShaderMode();
+
+		BeginShaderMode(spinShader);
+
+		Vector2 upcomingTPos1 = {332+(4*16), (4*16)};
+		
+		SetShaderValue(spinShader, centreLoc, &upcomingTPos1, SHADER_UNIFORM_VEC2);
 		m_Tetris.drawUpcomingTetronimo(renderer, 1, 11, 0, 1);
+		EndShaderMode();
+
+
+
 		m_Tetris.drawUpcomingTetronimo(renderer, 2, 32, 0, 0.5);
 		m_Tetris.drawSavedTetronimo(renderer, 11, 11, 1);
+		
+		
 		// TODO: MAKE THIS TAKE POSITIONS
 		EndMode2D();
 		//GUI
@@ -95,6 +121,7 @@ namespace Tetris
 	void GameScene::OnUpdate(float ts)
 	{
 
+		time += ts;
 		m_Tetris.Tick(ts);
 
 		if (IsKeyPressed(KEY_UP))
