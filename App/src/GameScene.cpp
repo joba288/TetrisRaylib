@@ -54,7 +54,7 @@ namespace Tetris
 		// Temp
 
 		m_Camera.offset = { screenWidth / 2.0f, screenHeight / 2.0f };
-		m_Camera.target = { m_Tetris.grid.pos.x + (GRID_WIDTH * SQUARE_SIZE) / 2, m_Tetris.grid.pos.y + (GRID_HEIGHT * SQUARE_SIZE) / 2 };
+		m_Camera.target = { (float)m_Tetris.grid.pos.x + (GRID_WIDTH * SQUARE_SIZE) / 2, (float)m_Tetris.grid.pos.y + (GRID_HEIGHT * SQUARE_SIZE) / 2 };
 		m_Camera.rotation = 0.0f;
 		m_Camera.zoom = 1.0f;
 
@@ -84,7 +84,8 @@ namespace Tetris
 		m_Tetris.drawGrid(renderer);
 		m_Tetris.drawCurrentTetronimo(renderer);
 		EndShaderMode();
-		m_Tetris.drawUpcomingTetronimos(renderer);
+		m_Tetris.drawUpcomingTetronimo(renderer, 1, 11, 0, 1);
+		m_Tetris.drawUpcomingTetronimo(renderer, 2, 32, 0, 0.5);
 		// TODO: MAKE THIS TAKE POSITIONS
 		EndMode2D();
 		//GUI

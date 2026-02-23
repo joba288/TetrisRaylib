@@ -74,24 +74,26 @@ namespace Tetris
 		return (((i - 1) * 4 + rotation) * 16 + (y * 4 + x));
 	}
 
-
+	struct ivec2 { int x, y; };
 
 	struct Grid
 	{
-		Vector2 pos = { 0, 0 };
+		ivec2 pos = { 0, 0 };
 		std::array<int, (GRID_WIDTH)* (GRID_HEIGHT)> grid = { 0 };
 		std::array<float, (GRID_WIDTH* GRID_HEIGHT)> gridDepth;
 
 		int& getSquare(int x, int y) { return grid[GRID_INDEX(x, y)]; }
 		float& getDepth(int x, int y) { return gridDepth[GRID_INDEX(x, y)]; }
-		int& getSquare(Vector2 pos) { return grid[GRID_INDEX((int)pos.x, (int)pos.y)]; } // getters and setters
+		int& getSquare(ivec2 pos) { return grid[GRID_INDEX((int)pos.x, (int)pos.y)]; } // getters and setters
 
 		void initDepthGrid()
 		{
-			for (int i = 0; i < 200; ++i) {
+			for (int i = 0; i < GRID_WIDTH*GRID_HEIGHT; ++i) {
 				gridDepth[i] = 0.0f;
 			}
 		}
+
+
 
 	};
 
@@ -104,10 +106,10 @@ namespace Tetris
 
 		TETRONIMO currentTetronimo = IBlock;
 		int currentRotation = 0;
-		Vector2 currentPos = {3, 0};
+		ivec2 currentPos = {3, 0};
 		float currentDepth = 2.0f;
-		Vector2 quickPlacePos = {3, 0};
-
+		ivec2 quickPlacePos = {3, 0};
+		int currentShape; 
 
 
 
@@ -123,19 +125,6 @@ namespace Tetris
 		float tickInterval = 0.3f;
 
 		std::array<Color, 8> colors = {LIGHTGRAY, SKYBLUE, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED};
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	
 		// INPUT FUNCTIONS
@@ -171,7 +160,6 @@ namespace Tetris
 			currentPos = quickPlacePos;
 		}
 		void onInputSaveTetronimoPressed() {}
-
 		void Tick(float ts) 
 		{
 			tickTimer += ts;
@@ -191,14 +179,67 @@ namespace Tetris
 		}
 		
 
+		// DRAW FUNCTIONS
+
+		void drawGrid(Core::RendererAdapter& r)
+		{
+			for (int y = 0; y < GRID_HEIGHT; y++)
+			{
+				for (int x = 0; x < GRID_WIDTH; x++)
+				{
+
+					int currentSquare = grid.getSquare(x, y);
+					Color c = colors[currentSquare]; // Replace color
+					r.drawRectangle(x * SQUARE_SIZE, y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, c.r, c.g, c.b, c.a);
+				}
+			}
+		}
+		void drawCurrentTetronimo(Core::RendererAdapter& r)
+		{
+			// Draws the current tetronimo at its grid position, as well as the place where it will land
+
+			for (int y = 0; y < 4; y++)
+			{
+				for (int x = 0; x < 4; x++)
+				{
+					int currentSquare = tetronimos[TETRONIMO_INDEX(currentTetronimo, currentRotation, x, y)];
+
+					if (currentSquare != 0)
+					{
+						Color c = colors[currentSquare];
+						r.drawRectangle(x * SQUARE_SIZE + currentPos.x * SQUARE_SIZE, y * SQUARE_SIZE + currentPos.y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, c.r, c.g, c.b, c.a);
+						r.drawRectangle(x * SQUARE_SIZE + quickPlacePos.x * SQUARE_SIZE, y * SQUARE_SIZE + quickPlacePos.y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, c.r, c.g, c.b, 125);
+					}
+				}
+			}
+
+		}
+		void drawUpcomingTetronimo(Core::RendererAdapter& r, unsigned int i, int posX, int posY, float scale)
+		{
+			TETRONIMO t = upcomingTetronimos[(currentTetronimoIndex + i) % 3];
+			int sSize = SQUARE_SIZE * scale;
+			for (int y = 0; y < 4; y++)
+			{
+				for (int x = 0; x < 4; x++)
+				{
+
+					int currentSquare = tetronimos[TETRONIMO_INDEX(t, 1, x, y)];
+					if (currentSquare != 0)
+					{
+						Color c = colors[currentSquare];
+						r.drawRectangle(x * sSize + posX * sSize,
+										y * sSize + posY * sSize, sSize,
+										sSize, c.r, c.g, c.b, c.a); // TODO Fix Scaling
+					}
+				}
+			}
+		}
+		void drawScore(Core::RendererAdapter& r)
+		{
+			r.drawText(std::to_string(score).c_str(), 20, 10, 80, 0, 0, 0, 255);
+		}
+
 		//
-
-
-
-
-
-
-
 
 		void combineGridTetronimoDepth(std::array<float, (GRID_WIDTH*GRID_HEIGHT)>& result)
 		{
@@ -223,127 +264,37 @@ namespace Tetris
 
 
 
-
-
-
-		void drawGrid(Core::RendererAdapter& r)
+		bool checkCollision(ivec2 pos)
 		{
-			for (int y = 0; y < GRID_HEIGHT; y++)
-			{
-				for (int x = 0; x < GRID_WIDTH; x++)
-				{
-
-					int currentSquare = grid.getSquare(x, y);
-					Color c = colors[currentSquare]; // Replace color
-					r.drawRectangle(x * SQUARE_SIZE, y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, c.r, c.g, c.b, c.a);
-				}
-			}
-		}
-
-		//drawTetronimo
-
-		void drawCurrentTetronimo(Core::RendererAdapter& r)
-		{
-			// Draws the current tetronimo at its grid position, as well as the place where it will land
+			const int* currentShape = &tetronimos[TETRONIMO_INDEX(currentTetronimo, currentRotation, 0, 0)];
 
 			for (int y = 0; y < 4; y++)
 			{
 				for (int x = 0; x < 4; x++)
 				{
-					int currentSquare = tetronimos[TETRONIMO_INDEX(currentTetronimo, currentRotation, x, y)]; 
+					int currentSquare = currentShape[y * 4 + x];
+					if (currentSquare == 0) continue;
 
-					if (currentSquare != 0)
-					{
-						Color c = colors[currentSquare];
-						r.drawRectangle(x * SQUARE_SIZE + currentPos.x * SQUARE_SIZE, y * SQUARE_SIZE + currentPos.y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, c.r, c.g, c.b, c.a);
-						r.drawRectangle(x * SQUARE_SIZE + quickPlacePos.x * SQUARE_SIZE, y * SQUARE_SIZE + quickPlacePos.y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, c.r, c.g, c.b, 125 );
-					}
+					if ((unsigned)(x+pos.x) >= GRID_WIDTH || (unsigned)(y+pos.y) >= GRID_HEIGHT)	// Out of Bounds
+						return true;
+
+					if (grid.getSquare(x + pos.x, y + pos.y) != 0) 
+						return true;
 				}
 			}
 
-		}
-
-		void drawUpcomingTetronimos(Core::RendererAdapter& r) // optimise
-		{
-			TETRONIMO t = upcomingTetronimos[(currentTetronimoIndex + 1) % 3];
-			for (int y = 0; y < 4; y++)
-			{
-				for (int x = 0; x < 4; x++)
-				{
-
-					int currentSquare = tetronimos[TETRONIMO_INDEX(t, 1, x, y)]; // look into cleaning this
-					if (currentSquare != 0)
-					{
-						Color c = colors[currentSquare];
-						r.drawRectangle(x * SQUARE_SIZE + 11.0f * SQUARE_SIZE, y * SQUARE_SIZE + 0.0f * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, c.r, c.g, c.b, c.a);
-						// fix hard coded values
-					}
-				}
-			}
-
-			t = upcomingTetronimos[(currentTetronimoIndex + 2) % 3];
-			for (int y = 0; y < 4; y++)
-			{
-				for (int x = 0; x < 4; x++)
-				{
-
-					int currentSquare = tetronimos[TETRONIMO_INDEX(t, 1, x, y)]; // look into cleaning this
-					Color c = colors[currentSquare];
-					r.drawRectangle(x * SQUARE_SIZE / 2 + 32.0f * SQUARE_SIZE / 2, y * SQUARE_SIZE / 2 + 0.0f * SQUARE_SIZE / 2, SQUARE_SIZE / 2, SQUARE_SIZE / 2, c.r, c.g, c.b, c.a);
-					// fix hard coded values
-				}
-			}
-		}
-
-		
-		
-		void drawScore(Core::RendererAdapter& r)
-		{
-			r.drawText(std::to_string(score).c_str(), 20, 10, 80, 0, 0, 0, 255);
-		}
-
-
-
-
-
-
-		bool checkCollision(Vector2 pos) // temporary needs cleaning up
-		{
-			bool coll = false;
-			for (int y = 0; y < 4; y++)
-			{
-				for (int x = 0; x < 4; x++)
-				{
-					int currentSquare = tetronimos[TETRONIMO_INDEX(currentTetronimo, currentRotation, x, y)];
-					if (currentSquare != 0)
-					{
-						if (((x + pos.x >= GRID_WIDTH || x + pos.x < 0) || (y + pos.y >= GRID_HEIGHT || y + pos.y < 0)))
-						{
-							coll = true;
-						}
-						else
-						{
-							if (grid.getSquare(x + pos.x, y + pos.y) != 0)
-								
-							{
-								coll = true;
-							}
-						}
-					}
-				}
-			}
-
-			return coll;
+			return false;
 		}
 
 		void placeCurrentTetronimo()
 		{
+			
 			for (int y = 0; y < 4; y++)
 			{
 				for (int x = 0; x < 4; x++)
 				{
 					int currentSquare = tetronimos[TETRONIMO_INDEX(currentTetronimo, currentRotation, x, y)];
-					Vector2 posInGrid = { x + currentPos.x, y + currentPos.y };
+					ivec2 posInGrid = { x + currentPos.x, y + currentPos.y };
 					if (currentSquare != 0)
 					{
 						grid.getSquare(posInGrid) = currentSquare;
@@ -354,30 +305,25 @@ namespace Tetris
 
 			resolveFullLines();
 
-
 			currentPos = { 3, 0 };
 			currentRotation = 0;
 			currentDepth = (rand() % 64 + 2) / 2;
-			
-			//currentDepth = 2.0f;
 			currentTetronimoIndex = ((currentTetronimoIndex + 1) % 3);				   //   increment index position for the next tetronimo
-			currentTetronimo = upcomingTetronimos[currentTetronimoIndex]; //			 set the next tetronimo as current
-			upcomingTetronimos[currentTetronimoIndex] = TETRONIMO(rand() % (7) + 1); //	 get new random tetronimo
-
+			currentTetronimo = upcomingTetronimos[currentTetronimoIndex]; //				set the next tetronimo as current
+			upcomingTetronimos[currentTetronimoIndex] = TETRONIMO(rand() % (7) + 1); //		get new random tetronimo
 			quickPlacePos = getLandingPosition();
-		
-
 		}
 
-		Vector2 getLandingPosition()
+		ivec2 getLandingPosition()
 		{
 			for (int y = currentPos.y; y < GRID_HEIGHT-1; y++)
 			{
-				if (checkCollision(Vector2{ currentPos.x, (float)y+1}))
+				if (checkCollision(ivec2{ currentPos.x, y+1}))
 				{
-					return Vector2{ currentPos.x, (float)y}; // dangerous
+					return ivec2{ currentPos.x, y}; 
 				}
 			}
+			return ivec2{ currentPos.x, (GRID_HEIGHT - 1) };
 
 		}
 
@@ -386,8 +332,8 @@ namespace Tetris
 
 		void resolveFullLines()
 		{
-			std::vector<int> fullLines;
-			fullLines.reserve(4);
+			std::array<bool, GRID_HEIGHT> linesFull{};
+			int combo = 0;
 
 			int emptyCount = 0;
 			for (int y = 0; y < GRID_HEIGHT; y++)
@@ -400,48 +346,36 @@ namespace Tetris
 					if (currentSquare == 0)
 					{
 						emptyCount++;
+						break;
 					}
 				}
 				if (emptyCount == 0)
 				{
-					fullLines.push_back(y);
+					linesFull[y] = true;
+					combo++;
 
 				}
 			}
 
-			// set lines to 0
+			score += combo * 4;
 
-			for (int i = 0; i < fullLines.size(); i++)
-			{
-				score+=fullLines.size();
-				for (int x = 0; x < GRID_WIDTH; x++)
-				{
-					grid.getSquare(x, fullLines[i]) = 0;
-				}
-			}
-			// move lines down
-			//	make new grid and skip over full lines
-			Grid newGrid;
-			newGrid.initDepthGrid();
+			int write_y = GRID_HEIGHT - 1;
 
-			int newGrid_y = GRID_HEIGHT - 1;
-			for (int y = GRID_HEIGHT-1; y > 0; y--)
+			for (int y = GRID_HEIGHT-1; y >= 0; y--)
 			{
-				bool emptyLine = 0;
-				for (int i = 0; i < fullLines.size(); i++) { if (y == fullLines[i]) emptyLine = 1; }
-				if (!emptyLine) {
+				if (!linesFull[y]) {
 					for (int x = 0; x < GRID_WIDTH; x++)
 					{
-						newGrid.getSquare(x, newGrid_y) = grid.getSquare(x, y); // i dont think this needs to be 2 for loops
-						newGrid.getDepth(x, newGrid_y) = grid.getDepth(x, y);
+						grid.getSquare(x, write_y) = grid.getSquare(x, y); // i dont think this needs to be 2 for loops
+						grid.getDepth(x, write_y) = grid.getDepth(x, y);
 
 
 					}
-					newGrid_y--;
+					write_y--;
 				}
 				
 			}
-			grid = newGrid; // change this to only be if any empty
+			
 			
 		}
 	};
