@@ -27,3 +27,20 @@ void Tetris::RaylibRenderer::drawText(const char* text, int x, int y, int size, 
         });
 }
 
+void Tetris::RaylibRenderer::drawTexture(const char* filePath, int x, int y, float size, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+{
+    // TODO Very crude, I will fix the problems of this with an asset manager but will do for now
+    
+    DrawTextureEx(tex, Vector2{(float)x, (float)y}, 0, size, 
+        Color{
+            (unsigned char)r,
+            (unsigned char)g,
+            (unsigned char)b,
+            (unsigned char)a
+        });
+}
+
+void Tetris::RaylibRenderer::LoadTexture(const char* filePath)
+{
+    tex = LoadTextureFromImage(LoadImage(filePath));
+}

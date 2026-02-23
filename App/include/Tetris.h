@@ -80,7 +80,7 @@ namespace Tetris
 	{
 		ivec2 pos = { 0, 0 };
 		std::array<int, (GRID_WIDTH)* (GRID_HEIGHT)> grid = { 0 };
-		std::array<float, (GRID_WIDTH* GRID_HEIGHT)> gridDepth;
+		std::array<float, (GRID_WIDTH* GRID_HEIGHT)> gridDepth = {0.0f};
 
 		int& getSquare(int x, int y) { return grid[GRID_INDEX(x, y)]; }
 		float& getDepth(int x, int y) { return gridDepth[GRID_INDEX(x, y)]; }
@@ -111,9 +111,6 @@ namespace Tetris
 		ivec2 quickPlacePos = {3, 0};
 		int currentShape; 
 
-
-
-
 		std::array<TETRONIMO, 3> upcomingTetronimos = { TETRONIMO(rand() % (7) + 1 ),
 														TETRONIMO(rand() % (7) + 1) ,
 														TETRONIMO(rand() % (7) + 1) };
@@ -125,6 +122,7 @@ namespace Tetris
 		float tickInterval = 0.3f;
 
 		std::array<Color, 8> colors = {LIGHTGRAY, SKYBLUE, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED};
+		std::string textureFilepath = "resources/squareTexture.jpg"; // TODO setup asset manager
 
 	
 		// INPUT FUNCTIONS
@@ -195,6 +193,7 @@ namespace Tetris
 
 		void drawGrid(Core::RendererAdapter& r)
 		{
+			r.LoadTexture(textureFilepath.c_str());
 			for (int y = 0; y < GRID_HEIGHT; y++)
 			{
 				for (int x = 0; x < GRID_WIDTH; x++)
@@ -202,7 +201,10 @@ namespace Tetris
 
 					int currentSquare = grid.getSquare(x, y);
 					Color c = colors[currentSquare]; // Replace color
-					r.drawRectangle(x * SQUARE_SIZE, y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, c.r, c.g, c.b, c.a);
+					if (currentSquare == 0)
+						r.drawRectangle(x * SQUARE_SIZE, y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, c.r, c.g, c.b, c.a);
+					else
+						r.drawTexture(textureFilepath.c_str(), x * SQUARE_SIZE, y * SQUARE_SIZE, 1, c.r, c.g, c.b, c.a);
 				}
 			}
 		}
@@ -219,8 +221,10 @@ namespace Tetris
 					if (currentSquare != 0)
 					{
 						Color c = colors[currentSquare];
-						r.drawRectangle(x * SQUARE_SIZE + currentPos.x * SQUARE_SIZE, y * SQUARE_SIZE + currentPos.y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, c.r, c.g, c.b, c.a);
-						r.drawRectangle(x * SQUARE_SIZE + quickPlacePos.x * SQUARE_SIZE, y * SQUARE_SIZE + quickPlacePos.y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, c.r, c.g, c.b, 125);
+						//r.drawRectangle(x * SQUARE_SIZE + currentPos.x * SQUARE_SIZE, y * SQUARE_SIZE + currentPos.y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, c.r, c.g, c.b, c.a);
+						r.drawTexture(textureFilepath.c_str(), x * SQUARE_SIZE + currentPos.x * SQUARE_SIZE, y * SQUARE_SIZE + currentPos.y * SQUARE_SIZE,1, c.r, c.g, c.b, c.a);
+						r.drawTexture(textureFilepath.c_str(), x * SQUARE_SIZE + quickPlacePos.x * SQUARE_SIZE, y * SQUARE_SIZE + quickPlacePos.y * SQUARE_SIZE,1, c.r, c.g, c.b, 125);
+						/*r.drawRectangle(x * SQUARE_SIZE + quickPlacePos.x * SQUARE_SIZE, y * SQUARE_SIZE + quickPlacePos.y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, c.r, c.g, c.b, 125);*/
 					}
 				}
 			}
@@ -248,9 +252,15 @@ namespace Tetris
 					//if (currentSquare != 0)
 					//{
 						Color c = colors[currentSquare];
-						r.drawRectangle(x * sSize + posX * sSize,
-							y * sSize + posY * sSize, sSize,
-							sSize, c.r, c.g, c.b, c.a); // TODO Fix Scaling
+						if (currentSquare == 0)
+							r.drawRectangle(x * sSize + posX * sSize,
+								y * sSize + posY * sSize, sSize,
+								sSize, c.r, c.g, c.b, c.a); // TODO Fix Scaling
+						else
+							r.drawTexture(textureFilepath.c_str(),
+								x * sSize + posX * sSize,
+								y * sSize + posY * sSize, scale, c.r, c.g, c.b, 255);
+
 					//}
 				}
 			}

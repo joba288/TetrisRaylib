@@ -93,8 +93,7 @@ namespace Tetris
 		m_Tetris.drawGrid(renderer);
 		m_Tetris.drawCurrentTetronimo(renderer);
 
-		Texture2D tex = LoadTextureFromImage(LoadImage("resources/squareTexture.jpg"));
-		DrawTexture(tex, m_Tetris.currentPos.x*squareSize, m_Tetris.currentPos.y*squareSize, m_Tetris.colors[m_Tetris.currentTetronimo]);
+
 
 		EndShaderMode();
 
