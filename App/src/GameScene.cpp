@@ -42,7 +42,6 @@ namespace Tetris
 
 
 	}
-
 	void GameScene::OnRender()
 	{
 
@@ -86,6 +85,7 @@ namespace Tetris
 		EndShaderMode();
 		m_Tetris.drawUpcomingTetronimo(renderer, 1, 11, 0, 1);
 		m_Tetris.drawUpcomingTetronimo(renderer, 2, 32, 0, 0.5);
+		m_Tetris.drawSavedTetronimo(renderer, 11, 11, 1);
 		// TODO: MAKE THIS TAKE POSITIONS
 		EndMode2D();
 		//GUI
@@ -108,6 +108,8 @@ namespace Tetris
 
 		if (IsKeyPressed(KEY_DOWN))
 			m_Tetris.onInputSpeedPlacePressed();
+		if (IsKeyPressed(KEY_SPACE))
+			m_Tetris.onInputSaveTetronimoPressed();
 
 		
 	}

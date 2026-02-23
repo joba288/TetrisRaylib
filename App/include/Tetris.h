@@ -159,7 +159,19 @@ namespace Tetris
 		{
 			currentPos = quickPlacePos;
 		}
-		void onInputSaveTetronimoPressed() {}
+		void onInputSaveTetronimoPressed()
+		{
+			if (savedTetronimo == 0) // None Saved
+			{
+				initNextTetronimo();
+				savedTetronimo = currentTetronimo;
+			}
+			else                     // Tetronimo Already Saved
+			{
+				initNextTetronimo(savedTetronimo);
+				savedTetronimo = TETRONIMO(0);
+			}
+		}
 		void Tick(float ts) 
 		{
 			tickTimer += ts;
@@ -217,6 +229,15 @@ namespace Tetris
 		void drawUpcomingTetronimo(Core::RendererAdapter& r, unsigned int i, int posX, int posY, float scale)
 		{
 			TETRONIMO t = upcomingTetronimos[(currentTetronimoIndex + i) % 3];
+			drawGUITetronimo(r, t, posX, posY, scale);
+		}
+		void drawSavedTetronimo(Core::RendererAdapter& r, int posX, int posY, float scale)
+		{
+			if (savedTetronimo != 0)
+				drawGUITetronimo(r, savedTetronimo, posX, posY, scale);
+		}
+		void drawGUITetronimo(Core::RendererAdapter& r, TETRONIMO t, int posX, int posY, float scale)
+		{
 			int sSize = SQUARE_SIZE * scale;
 			for (int y = 0; y < 4; y++)
 			{
@@ -228,8 +249,8 @@ namespace Tetris
 					{
 						Color c = colors[currentSquare];
 						r.drawRectangle(x * sSize + posX * sSize,
-										y * sSize + posY * sSize, sSize,
-										sSize, c.r, c.g, c.b, c.a); // TODO Fix Scaling
+							y * sSize + posY * sSize, sSize,
+							sSize, c.r, c.g, c.b, c.a); // TODO Fix Scaling
 					}
 				}
 			}
@@ -304,12 +325,29 @@ namespace Tetris
 			}
 
 			resolveFullLines();
+			initNextTetronimo();
 
+
+		}
+
+		void initNextTetronimo()
+		{
 			currentPos = { 3, 0 };
 			currentRotation = 0;
 			currentDepth = (rand() % 64 + 2) / 2;
 			currentTetronimoIndex = ((currentTetronimoIndex + 1) % 3);				   //   increment index position for the next tetronimo
 			currentTetronimo = upcomingTetronimos[currentTetronimoIndex]; //				set the next tetronimo as current
+			upcomingTetronimos[currentTetronimoIndex] = TETRONIMO(rand() % (7) + 1); //		get new random tetronimo
+			quickPlacePos = getLandingPosition();
+		}
+
+		void initNextTetronimo(TETRONIMO t)
+		{
+			currentPos = { 3, 0 };
+			currentRotation = 0;
+			currentDepth = (rand() % 64 + 2) / 2;
+			currentTetronimoIndex = ((currentTetronimoIndex + 1) % 3);				   //   increment index position for the next tetronimo
+			currentTetronimo = t; //				set the next tetronimo as current
 			upcomingTetronimos[currentTetronimoIndex] = TETRONIMO(rand() % (7) + 1); //		get new random tetronimo
 			quickPlacePos = getLandingPosition();
 		}
