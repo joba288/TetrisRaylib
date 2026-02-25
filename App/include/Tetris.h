@@ -92,9 +92,6 @@ namespace Tetris
 				gridDepth[i] = 0.0f;
 			}
 		}
-
-
-
 	};
 
 	struct Tetris // Change to class
@@ -161,8 +158,9 @@ namespace Tetris
 		{
 			if (savedTetronimo == 0) // None Saved
 			{
-				initNextTetronimo();
+				
 				savedTetronimo = currentTetronimo;
+				initNextTetronimo();
 			}
 			else                     // Tetronimo Already Saved
 			{
@@ -190,15 +188,16 @@ namespace Tetris
 		
 
 		// DRAW FUNCTIONS
-
-		void drawGrid(Core::RendererAdapter& r)
+		void loadTexture(Core::RendererAdapter& r)
 		{
 			r.LoadTexture(textureFilepath.c_str());
+		}
+		void drawGrid(Core::RendererAdapter& r)
+		{
 			for (int y = 0; y < GRID_HEIGHT; y++)
 			{
 				for (int x = 0; x < GRID_WIDTH; x++)
 				{
-
 					int currentSquare = grid.getSquare(x, y);
 					Color c = colors[currentSquare]; // Replace color
 					if (currentSquare == 0)
@@ -221,11 +220,8 @@ namespace Tetris
 					if (currentSquare != 0)
 					{
 						Color c = colors[currentSquare];
-						//r.drawRectangle(x * SQUARE_SIZE + currentPos.x * SQUARE_SIZE, y * SQUARE_SIZE + currentPos.y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, c.r, c.g, c.b, c.a);
 						r.drawTexture(textureFilepath.c_str(), x * SQUARE_SIZE + currentPos.x * SQUARE_SIZE, y * SQUARE_SIZE + currentPos.y * SQUARE_SIZE,1, c.r, c.g, c.b, c.a);
-						r.drawTexture(textureFilepath.c_str(), x * SQUARE_SIZE + quickPlacePos.x * SQUARE_SIZE, y * SQUARE_SIZE + quickPlacePos.y * SQUARE_SIZE,1, c.r, c.g, c.b, 125);
-						/*r.drawRectangle(x * SQUARE_SIZE + quickPlacePos.x * SQUARE_SIZE, y * SQUARE_SIZE + quickPlacePos.y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, c.r, c.g, c.b, 125);*/
-					}
+						r.drawTexture(textureFilepath.c_str(), x * SQUARE_SIZE + quickPlacePos.x * SQUARE_SIZE, y * SQUARE_SIZE + quickPlacePos.y * SQUARE_SIZE,1, c.r, c.g, c.b, 125);					}
 				}
 			}
 

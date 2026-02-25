@@ -15,6 +15,8 @@ int main()
     application.GetSceneManager().PushScene<Tetris::GameScene>();
     application.GetSceneManager().PushScene<Tetris::DeathScene>();
 
+    application.addTexture("Block", "resources/squareTexture.jpg");
+
     application.GotoScene(1);
     application.Run();
 }

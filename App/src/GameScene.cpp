@@ -40,11 +40,8 @@ namespace Tetris
 
 		lightingShader = LoadShaderFromMemory(vsLighting.c_str(), fsLighting.c_str());
 
-
-
-
 		spinShader = LoadShader("resources/vsSpin.glsl", "resources/fsBase.glsl");
-
+		m_Tetris.loadTexture(renderer);
 
 	}
 	void GameScene::OnRender()
@@ -72,7 +69,7 @@ namespace Tetris
 		float screenSize[2] = { screenWidth, screenHeight };
 		SetShaderValue(lightingShader, screenSizeLoc, &screenSize, SHADER_UNIFORM_VEC2);
 		int lightPosLoc = GetShaderLocation(lightingShader, "lightPos");
-		float mouseUV[2] = {GetMouseX()-screenWidth/2.0, GetMouseY()};
+		float mouseUV[2] = {GetMouseX(), GetMouseY()};
 		SetShaderValue(lightingShader, lightPosLoc, &mouseUV, SHADER_UNIFORM_VEC2);
 		int squareSizeLoc = GetShaderLocation(lightingShader, "squareSize");
 		int squareSize = SQUARE_SIZE;
@@ -87,9 +84,9 @@ namespace Tetris
 		SetShaderValue(spinShader, tLoc, &time, SHADER_UNIFORM_FLOAT);
 		int centreLoc = GetShaderLocation(spinShader, "centre");
 
-		BeginMode2D(m_Camera);
+		//BeginMode2D(m_Camera);
 		BeginShaderMode(lightingShader);
-
+		
 		m_Tetris.drawGrid(renderer);
 		m_Tetris.drawCurrentTetronimo(renderer);
 
@@ -112,7 +109,7 @@ namespace Tetris
 		
 		
 		// TODO: MAKE THIS TAKE POSITIONS
-		EndMode2D();
+		//EndMode2D();
 		//GUI
 		m_Tetris.drawScore(renderer);
 

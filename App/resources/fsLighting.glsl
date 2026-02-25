@@ -21,6 +21,7 @@ out vec4 finalColor;
 
 
 // need to pass in the depth grid
+
 uniform float depthGrid[GRID_WIDTH * GRID_HEIGHT]; // INJECTED VALUES
 uniform vec2 windowSize;
 uniform vec2 lightPos;

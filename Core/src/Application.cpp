@@ -1,5 +1,7 @@
 #include "Application.h"
 #include "SceneManager.h"
+#include <AssetManager.h>
+
 #include <raylib.h>
 #include <algorithm>
 
@@ -79,6 +81,15 @@ namespace Core
 		
 	}
 
+
+	bool Application::addTexture(const std::string& assetName, const std::string& filepath)
+	{
+		return m_AssetManager.addTexture(assetName, filepath);
+	}
+	const Texture& Application::getTexture(const std::string& assetName)
+	{
+		return m_AssetManager.getTexture(assetName);
+	}
 
 
 
