@@ -16,6 +16,7 @@ int main()
     application.GetSceneManager().PushScene<Tetris::DeathScene>();
 
     application.addTexture("Block", "resources/squareTexture.jpg");
+    application.GetAssetManager().addShader("Spin", "resources/vsSpin.glsl", "resources/fsBase.glsl");
 
     application.GotoScene(1);
     application.Run();
