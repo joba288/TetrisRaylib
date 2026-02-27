@@ -41,7 +41,7 @@ namespace Tetris
 		lightingShader = LoadShaderFromMemory(vsLighting.c_str(), fsLighting.c_str());
 
 		spinShader = LoadShader("resources/vsSpin.glsl", "resources/fsBase.glsl");
-		m_Tetris.loadTexture(renderer);
+		renderer.LoadTexture("Block");
 
 	}
 	void GameScene::OnRender()

@@ -13,7 +13,7 @@ namespace Core
 			return false;
 		}
 
-		// Attempt to load the texture
+		
 		Texture t = LoadTexture(filepath.c_str());
 
 		if (t.id <= 0)	// Load Failed
@@ -21,7 +21,7 @@ namespace Core
 			std::cout << "Failed to load texture " + assetName << std::endl;
 			return false;
 		}
-		// Add to map, transfer ownership
+		
 		m_TextureMap.emplace(assetName, std::make_shared<Texture>(t));
 		return true;
 		

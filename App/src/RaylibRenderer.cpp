@@ -1,5 +1,6 @@
 #include <RaylibRenderer.h>
 #include <raylib.h>
+#include <Application.h>
 
 
 
@@ -27,9 +28,8 @@ void Tetris::RaylibRenderer::drawText(const char* text, int x, int y, int size, 
         });
 }
 
-void Tetris::RaylibRenderer::drawTexture(const char* filePath, int x, int y, float size, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+void Tetris::RaylibRenderer::drawTexture(int x, int y, float size, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 {
-    // TODO Very crude, I will fix the problems of this with an asset manager but will do for now
     
     DrawTextureEx(tex, Vector2{(float)x, (float)y}, 0, size, 
         Color{
@@ -40,7 +40,7 @@ void Tetris::RaylibRenderer::drawTexture(const char* filePath, int x, int y, flo
         });
 }
 
-void Tetris::RaylibRenderer::LoadTexture(const char* filePath)
+void Tetris::RaylibRenderer::LoadTexture(const std::string& assetName)
 {
-    tex = LoadTextureFromImage(LoadImage(filePath));
+    tex = Core::Application::Get().getTexture(assetName);
 }
