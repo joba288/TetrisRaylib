@@ -43,6 +43,7 @@ namespace Tetris
 
 		lightingShader = Core::Application::Get().GetAssetManager().getShader("Lighting");
 		spinShader = Core::Application::Get().GetAssetManager().getShader("Spin");
+		trailShader = Core::Application::Get().GetAssetManager().getShader("Trail");
 
 		// Locs
 		depthGridLoc = GetShaderLocation(lightingShader, "depthGrid");
@@ -53,6 +54,18 @@ namespace Tetris
 
 		tLoc = GetShaderLocation(spinShader, "t");
 		centreLoc = GetShaderLocation(spinShader, "centre");
+
+		trail_StartLoc = GetShaderLocation(trailShader, "trailStart");
+		trail_gridHeightLoc = GetShaderLocation(trailShader, "gridHeight");
+		trail_screenSizeLoc = GetShaderLocation(trailShader, "windowSize");
+		trail_squareSizeLoc = GetShaderLocation(trailShader, "squareSize");
+		trail_currentTimeLoc = GetShaderLocation(trailShader, "currentTime");
+		trail_timePlacedLoc = GetShaderLocation(trailShader, "timePlaced");
+
+		SetShaderValue(trailShader, trail_gridHeightLoc, &GRID_HEIGHT, SHADER_UNIFORM_INT);
+		SetShaderValue(trailShader, trail_screenSizeLoc, &screenSize, SHADER_UNIFORM_VEC2);
+		SetShaderValue(trailShader, trail_squareSizeLoc, &SQUARE_SIZE, SHADER_UNIFORM_INT);
+
 
 		renderer.LoadTexture("Block");
 
@@ -84,7 +97,22 @@ namespace Tetris
 		//BeginMode2D(m_Camera);
 		BeginShaderMode(lightingShader);
 			m_Tetris.drawGrid(renderer);
+		EndShaderMode();
+
+		
+
+		BeginShaderMode(lightingShader);
 			m_Tetris.drawCurrentTetronimo(renderer);
+		EndShaderMode();
+
+		SetShaderValue(trailShader, trail_StartLoc, &m_Tetris.trailStart.y, SHADER_UNIFORM_INT);
+
+
+		SetShaderValue(trailShader, trail_currentTimeLoc, &time, SHADER_UNIFORM_FLOAT);
+		SetShaderValue(trailShader, trail_timePlacedLoc, &timePlaced, SHADER_UNIFORM_FLOAT);
+
+		BeginShaderMode(trailShader);
+			m_Tetris.drawTrail(renderer);
 		EndShaderMode();
 
 		BeginShaderMode(spinShader);
@@ -100,8 +128,13 @@ namespace Tetris
 		// TODO: MAKE THIS TAKE POSITIONS
 		
 		//EndMode2D();
+		
+		 
+		
 		//GUI
 		m_Tetris.drawScore(renderer);
+
+
 
 	}
 	void GameScene::OnUpdate(float ts)
@@ -109,27 +142,35 @@ namespace Tetris
 
 		time += ts;
 		m_Tetris.Tick(ts);
-		
+		m_Tetris.combineGridTetronimoDepth(gridAndCurrentDepth);
+
 
 		if (IsKeyPressed(KEY_UP))
+		{
 			m_Tetris.onInputRotatePressed();
-			m_Tetris.combineGridTetronimoDepth(gridAndCurrentDepth);
-
+			/*m_Tetris.combineGridTetronimoDepth(gridAndCurrentDepth);*/
+	}
 		if (IsKeyPressed(KEY_RIGHT))
+		{
 			m_Tetris.onInputRightPressed();
-			m_Tetris.combineGridTetronimoDepth(gridAndCurrentDepth);
-		
+			/*m_Tetris.combineGridTetronimoDepth(gridAndCurrentDepth);*/
+		}
 		if (IsKeyPressed(KEY_LEFT))
+		{
 			m_Tetris.onInputLeftPressed();
-			m_Tetris.combineGridTetronimoDepth(gridAndCurrentDepth);
-
+			/*m_Tetris.combineGridTetronimoDepth(gridAndCurrentDepth);*/
+	}
 		if (IsKeyPressed(KEY_DOWN))
-			m_Tetris.onInputSpeedPlacePressed();
-			m_Tetris.combineGridTetronimoDepth(gridAndCurrentDepth);
+			{
+				m_Tetris.onInputSpeedPlacePressed();
+				/*m_Tetris.combineGridTetronimoDepth(gridAndCurrentDepth);*/
+				timePlaced = time;
+			}
 		if (IsKeyPressed(KEY_SPACE))
+		{
 			m_Tetris.onInputSaveTetronimoPressed();
-			m_Tetris.combineGridTetronimoDepth(gridAndCurrentDepth);
-
+			/*m_Tetris.combineGridTetronimoDepth(gridAndCurrentDepth);*/
+		}
 		
 	}
 

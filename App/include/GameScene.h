@@ -19,6 +19,7 @@ namespace Tetris {
 		Camera2D m_Camera = { 0 };
 		Shader lightingShader;
 		Shader spinShader;
+		Shader trailShader;
 
 		//Lighting Shader
 		int depthGridLoc;
@@ -29,8 +30,16 @@ namespace Tetris {
 		//Spin Shader
 		int tLoc;
 		int centreLoc;
+		//Trail Shader
+		int trail_StartLoc;
+		int trail_gridHeightLoc;
+		int trail_screenSizeLoc;
+		int trail_squareSizeLoc;
+		int trail_currentTimeLoc;
+		int trail_timePlacedLoc;
 
 		float time = 0.f;
+		float timePlaced = 0.f;
 
 		RaylibRenderer renderer;
 

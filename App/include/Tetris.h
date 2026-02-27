@@ -106,6 +106,14 @@ namespace Tetris
 		ivec2 currentPos = {3, 0};
 		float currentDepth = 2.0f;
 		ivec2 quickPlacePos = {3, 0};
+
+		ivec2 previousPos = { 0, 0 };
+
+		ivec2 trailStart = currentPos;
+		int trailEndY = quickPlacePos.y;
+		int trailRot = 0;
+		TETRONIMO trailTetronimo = currentTetronimo;
+
 		int currentShape; 
 
 		std::array<TETRONIMO, 3> upcomingTetronimos = { TETRONIMO(rand() % (7) + 1 ),
@@ -119,6 +127,9 @@ namespace Tetris
 		float tickInterval = 0.3f;
 
 		std::array<Color, 8> colors = {LIGHTGRAY, SKYBLUE, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED};
+
+		Color trailColor = colors[currentTetronimo];
+		
 
 	
 		// INPUT FUNCTIONS
@@ -138,7 +149,9 @@ namespace Tetris
 			if (!checkCollision({ currentPos.x - 1, currentPos.y }))
 			{
 				currentPos.x -= 1;
+				
 				quickPlacePos = getLandingPosition();
+				
 			}
 		}
 		void onInputRightPressed() 
@@ -146,12 +159,19 @@ namespace Tetris
 			if (!checkCollision({ currentPos.x + 1, currentPos.y }))
 			{
 				currentPos.x += 1;
+				
 				quickPlacePos = getLandingPosition();
+
 			}
 		}
-		void onInputSpeedPlacePressed() 
+		void onInputSpeedPlacePressed()
 		{
+			trailStart = currentPos; trailEndY = quickPlacePos.y;
+			trailColor = colors[currentTetronimo];
+			trailRot = currentRotation;
+			trailTetronimo = currentTetronimo;
 			currentPos = quickPlacePos;
+			
 		}
 		void onInputSaveTetronimoPressed()
 		{
@@ -260,7 +280,40 @@ namespace Tetris
 		{
 			r.drawText(std::to_string(score).c_str(), 20, 10, 80, 0, 0, 0, 255);
 		}
+		void drawTrail(Core::RendererAdapter& r)
+		{
+			Color c = trailColor;
 
+			// Find start and end of the tetronimo
+			ivec2 minPos = { 4,4 };
+			ivec2 maxPos = { -1,-1 };
+
+			for (int y = 0; y < 4; y++)
+			{
+				for (int x = 0; x < 4; x++)
+				{
+					int currentSquare = tetronimos[TETRONIMO_INDEX(trailTetronimo, trailRot, x, y)]; // TODO Cache this somewhere
+					if (currentSquare != 0)
+					{
+						if (x < minPos.x) minPos.x = x;
+						if (y < minPos.y) minPos.y = y;
+						if (x > maxPos.x) maxPos.x = x;
+						if (y > maxPos.y) maxPos.y = y;
+					}
+				}
+			}
+
+			minPos.x += trailStart.x;
+			minPos.y += trailStart.y;
+			maxPos.x += trailStart.x;
+			maxPos.y += trailStart.y;
+
+			r.drawRectangle(
+				minPos.x * SQUARE_SIZE,
+				minPos.y * SQUARE_SIZE,
+				(maxPos.x - minPos.x + 1) * SQUARE_SIZE,
+				(trailEndY - minPos.y + 2) * SQUARE_SIZE, c.r, c.g, c.b, c.a);
+		}
 		//
 
 		void combineGridTetronimoDepth(std::array<float, (GRID_WIDTH*GRID_HEIGHT)>& result)
