@@ -45,6 +45,7 @@ namespace Tetris
 		lightingShader = Core::Application::Get().GetAssetManager().getShader("Lighting");
 		spinShader = Core::Application::Get().GetAssetManager().getShader("Spin");
 		trailShader = Core::Application::Get().GetAssetManager().getShader("Trail");
+		pulsateShader = Core::Application::Get().GetAssetManager().getShader("Pulsate");
 
 		// Locs
 		depthGridLoc = GetShaderLocation(lightingShader, "depthGrid");
@@ -67,6 +68,8 @@ namespace Tetris
 		SetShaderValue(trailShader, trail_screenSizeLoc, &screenSize, SHADER_UNIFORM_VEC2);
 		SetShaderValue(trailShader, trail_squareSizeLoc, &SQUARE_SIZE, SHADER_UNIFORM_INT);
 
+		pulsate_timeLoc = GetShaderLocation(pulsateShader, "t");
+		pulsate_centreLoc = GetShaderLocation(pulsateShader, "centre");
 
 		renderer.LoadTexture("Block");
 
@@ -99,7 +102,7 @@ namespace Tetris
 		SetShaderValue(lightingShader, squareSizeLoc, &squareSize, SHADER_UNIFORM_INT);
 		SetShaderValue(lightingShader, gridSizeLoc, &gridSize, SHADER_UNIFORM_IVEC2);
 		SetShaderValue(spinShader, tLoc, &time, SHADER_UNIFORM_FLOAT);
-		
+		SetShaderValue(pulsateShader, pulsate_timeLoc, &time, SHADER_UNIFORM_FLOAT);
 		
 
 
@@ -182,9 +185,23 @@ namespace Tetris
 
 
 
+		BeginShaderMode(pulsateShader);
+		scale = .75f;
 
-		m_Tetris.drawSavedTetronimo(renderer, -4, 17, .75);
-		
+		pos = {
+			-4 * SQUARE_SIZE,
+			17 * SQUARE_SIZE
+		};
+
+
+		blockSize = SQUARE_SIZE * scale;
+		centre = {
+			pos.x + blockSize * 2.0f,
+			pos.y + blockSize * 2.0f
+		};
+		SetShaderValue(pulsateShader, pulsate_centreLoc, &centre, SHADER_UNIFORM_VEC2);
+		m_Tetris.drawSavedTetronimo(renderer, pos.x/SQUARE_SIZE, pos.y/SQUARE_SIZE, scale);
+		EndShaderMode();
 		
 
 		// TODO: MAKE THIS TAKE POSITIONS

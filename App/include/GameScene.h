@@ -29,6 +29,7 @@ namespace Tetris {
 		Shader lightingShader;
 		Shader spinShader;
 		Shader trailShader;
+		Shader pulsateShader;
 
 		//Lighting Shader
 		int depthGridLoc;
@@ -47,8 +48,13 @@ namespace Tetris {
 		int trail_currentTimeLoc;
 		int trail_timePlacedLoc;
 
+
 		float time = 0.f;
 		float timePlaced = 0.f;
+		// Pulsate
+		int pulsate_timeLoc;
+		int pulsate_centreLoc;
+
 
 		RaylibRenderer renderer;
 

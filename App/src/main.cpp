@@ -18,6 +18,7 @@ int main()
     application.addTexture("Block", "resources/squareTexture.jpg");
     application.GetAssetManager().addShader("Spin", "resources/vsSpin.glsl", "resources/fsBase.glsl");
     application.GetAssetManager().addShader("Trail", "resources/vsBase.glsl", "resources/fsTrail.glsl");
+    application.GetAssetManager().addShader("Pulsate", "resources/vsPulsate.glsl", "resources/fsBase.glsl");
 
     application.GotoScene(1);
     application.Run();
