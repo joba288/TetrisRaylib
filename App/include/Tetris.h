@@ -129,6 +129,9 @@ namespace Tetris
 		std::array<Color, 8> colors = {LIGHTGRAY, SKYBLUE, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED};
 
 		Color trailColor = colors[currentTetronimo];
+
+		Vector2 minPos;
+		Vector3 maxPos;
 		
 
 	
@@ -285,8 +288,8 @@ namespace Tetris
 			Color c = trailColor;
 
 			// Find start and end of the tetronimo
-			ivec2 minPos = { 4,4 };
-			ivec2 maxPos = { -1,-1 };
+			minPos = { 4,4 };
+			maxPos = { -1,-1 };
 
 			for (int y = 0; y < 4; y++)
 			{

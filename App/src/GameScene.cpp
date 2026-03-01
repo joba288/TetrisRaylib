@@ -70,25 +70,20 @@ namespace Tetris
 
 		renderer.LoadTexture("Block");
 
-		m_Camera.offset = { screenWidth / 2.0f, screenHeight / 2.0f };
-		m_Camera.target = { (float)m_Tetris.grid.pos.x + (GRID_WIDTH * SQUARE_SIZE) / 2, (float)m_Tetris.grid.pos.y + (GRID_HEIGHT * SQUARE_SIZE) / 2 };
-		m_Camera.rotation = 0.0f;
-		m_Camera.zoom = 1.0f;
-
 		screenWidth = Core::Application::Get().GetSpec().ScreenWidth;
 		screenHeight = Core::Application::Get().GetSpec().ScreenHeight;
 		screenSize[0] = screenWidth; screenSize[1] = screenHeight;
 
-		Core::Particle p = Core::Particle{ Vector2{100, 100},
-											Vector2{0},
-											Vector2{100, 100},
-											Vector2{50, 60},
-											WHITE,
-											Color{255, 255, 255, 0},
-											0.f,
-											10.f,
-											100.f};
-		particleSystem.addParticle(p);
+		m_Camera.offset = { (float)screenWidth / 2.f, (float)screenHeight / 2.f };
+		m_BaseCamOffset = m_Camera.offset;
+		m_Camera.target = { (float)m_Tetris.grid.pos.x + (GRID_WIDTH * SQUARE_SIZE) / 2
+							, (float)m_Tetris.grid.pos.y + (GRID_HEIGHT * SQUARE_SIZE) / 2 };
+		m_Camera.rotation = 0.0f;
+		m_Camera.zoom = 1.0f;
+
+
+
+
 	}
 
 	
@@ -105,8 +100,11 @@ namespace Tetris
 		SetShaderValue(lightingShader, gridSizeLoc, &gridSize, SHADER_UNIFORM_IVEC2);
 		SetShaderValue(spinShader, tLoc, &time, SHADER_UNIFORM_FLOAT);
 		
+		
 
-		//BeginMode2D(m_Camera);
+
+		BeginMode2D(m_Camera);
+
 		BeginShaderMode(lightingShader);
 			m_Tetris.drawGrid(renderer);
 		EndShaderMode();
@@ -132,6 +130,10 @@ namespace Tetris
 			SetShaderValue(spinShader, centreLoc, &upcomingTPos1, SHADER_UNIFORM_VEC2);
 			m_Tetris.drawUpcomingTetronimo(renderer, 1, 11, 0, 1);
 		EndShaderMode();
+		m_ParticleSystem.drawParticles();
+
+		
+
 
 		m_Tetris.drawUpcomingTetronimo(renderer, 2, 32, 0, 0.5);
 		m_Tetris.drawSavedTetronimo(renderer, 11, 11, 1);
@@ -139,33 +141,34 @@ namespace Tetris
 		
 
 		// TODO: MAKE THIS TAKE POSITIONS
-		
-		particleSystem.drawParticles();
+		EndMode2D();
 
-		//EndMode2D();
-		
 		 
 		
 		//GUI
 		m_Tetris.drawScore(renderer);
+		//DrawText(std::to_string(m_ShakeTime).c_str(), 100, 100, 64, BLACK);
 
 
 
 	}
 	void GameScene::OnUpdate(float ts)
 	{
-		particleSystem.onUpdate(ts);
+		m_ParticleSystem.onUpdate(ts);
 
 		time += ts;
 		m_Tetris.Tick(ts);
 		m_Tetris.combineGridTetronimoDepth(gridAndCurrentDepth);
+
+		shakeCamera(ts);
+
 
 
 		if (IsKeyPressed(KEY_UP))
 		{
 			m_Tetris.onInputRotatePressed();
 			/*m_Tetris.combineGridTetronimoDepth(gridAndCurrentDepth);*/
-	}
+		}
 		if (IsKeyPressed(KEY_RIGHT))
 		{
 			m_Tetris.onInputRightPressed();
@@ -177,32 +180,59 @@ namespace Tetris
 			/*m_Tetris.combineGridTetronimoDepth(gridAndCurrentDepth);*/
 	}
 		if (IsKeyPressed(KEY_DOWN))
-			{
+		{
+			setCameraShake(2,0.25f);
+			m_Tetris.onInputSpeedPlacePressed();
+			/*m_Tetris.combineGridTetronimoDepth(gridAndCurrentDepth);*/
+			timePlaced = time;
+
 				// TODO Temporary
-				for (int i = m_Tetris.currentPos.y; i < GRID_HEIGHT; i++)
+				/*
+				for (int i = m_Tetris.trailStart.y; i < m_Tetris.trailEndY; i++)
 				{
-					particleSystem.addParticle(Core::Particle{ Vector2{(float)(m_Tetris.currentPos.x + 2) * SQUARE_SIZE, (float)i * 32},
-											Vector2{0},
-											Vector2{15, 15},
+					particleSystem.addParticle(Core::Particle{ Vector2{(float)(m_Tetris.minPos.x+m_Tetris.trailStart.x) * SQUARE_SIZE, (float)i * 32},
+											Vector2{0, 100},
+											Vector2{10, 10},
 											Vector2{1, 1},
 											m_Tetris.colors[m_Tetris.currentTetronimo],
 											Color{255, 255, 255, 0},
-											0.f,
-											(float)i,
+											(float)0,
+											32.f - i,
 											0.f });
 				}
-				m_Tetris.onInputSpeedPlacePressed();
-				/*m_Tetris.combineGridTetronimoDepth(gridAndCurrentDepth);*/
-				timePlaced = time;
-				
+				*/
 
-			}
+		}
 		if (IsKeyPressed(KEY_SPACE))
 		{
 			m_Tetris.onInputSaveTetronimoPressed();
 			/*m_Tetris.combineGridTetronimoDepth(gridAndCurrentDepth);*/
 		}
 		
+	}
+
+	void GameScene::setCameraShake(float intensity, float duration)
+	{
+		m_ShakeIntensity = intensity;
+		m_ShakeTime = duration;
+	}
+
+	void GameScene::shakeCamera(float ts)
+	{
+		if (m_ShakeIntensity > 0.0)
+			m_Screenshake = { (rand() % int(m_ShakeIntensity) - m_ShakeIntensity / 2) ,
+						      (rand() % int(m_ShakeIntensity) - m_ShakeIntensity / 2) };
+
+		m_ShakeTime -= ts;
+		if (m_ShakeTime <= 0.0f)
+		{
+			m_ShakeTime = 0.0f;
+			m_Screenshake = { 0.0f };
+		}
+
+		m_Camera.offset.x = m_BaseCamOffset.x + m_Screenshake.x;
+		m_Camera.offset.y = m_BaseCamOffset.y + m_Screenshake.y;
+
 	}
 
 	GameScene::GameScene() {}

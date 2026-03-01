@@ -15,10 +15,17 @@ namespace Tetris {
 		virtual void OnRender() override;
 		virtual void OnUpdate(float ts) override;
 
+		void setCameraShake(float intensity, float duration);
+		void shakeCamera(float ts);
+
 	private:
 		Tetris m_Tetris;
-		Core::ParticleSystem particleSystem;
+		Core::ParticleSystem m_ParticleSystem;
 		Camera2D m_Camera = { 0 };
+		Vector2 m_BaseCamOffset = {0};
+		Vector2 m_Screenshake = {0};
+		float m_ShakeIntensity = 0;
+		float m_ShakeTime = 0.0f;
 		Shader lightingShader;
 		Shader spinShader;
 		Shader trailShader;

@@ -16,7 +16,7 @@ namespace Core
 			Color c = ColorLerp(p.colorStart, p.colorEnd, p.age);
 			Vector2 size = Vector2Lerp(p.sizeStart, p.sizeEnd, p.age);
 
-			DrawRectanglePro(Rectangle{ p.pos.x, p.pos.y, size.x, size.y }, Vector2{ 0.0f, 0.0f }, p.rotation, c);
+			DrawRectanglePro(Rectangle{ p.pos.x - size.x, p.pos.y - size.y, size.x, size.y }, Vector2{0.0, 0.0 }, p.rotation, c);
 		}
 	}
 
@@ -24,12 +24,15 @@ namespace Core
 	{
 		for (auto& p : m_Particles)
 		{
+			p.pos.x += p.velocity.x * ts;
+			p.pos.y += p.velocity.y * ts;
+
 			if (p.age <= p.lifetime)
 				p.age += ts;
 			else
 				m_Particles.erase(
 					std::remove_if(m_Particles.begin(), m_Particles.end(),
-						[](const Particle& p) { return p.age > p.lifetime;}),
+						[](const Particle& p) { return p.age > p.lifetime; }),
 					m_Particles.end());
 		}
 	}
