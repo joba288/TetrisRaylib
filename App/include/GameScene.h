@@ -2,6 +2,7 @@
 #include "SceneManager.h"
 #include "Tetris.h"
 #include "RaylibRenderer.h"
+#include "ParticleSystem.h"
 
 namespace Tetris {
 	class GameScene : public Core::Scene
@@ -16,6 +17,7 @@ namespace Tetris {
 
 	private:
 		Tetris m_Tetris;
+		Core::ParticleSystem particleSystem;
 		Camera2D m_Camera = { 0 };
 		Shader lightingShader;
 		Shader spinShader;

@@ -7,6 +7,7 @@
 #include <iostream>
 #include <algorithm>
 #include <array>
+#include <ParticleSystem.h>
 
 namespace Tetris
 {
@@ -77,6 +78,17 @@ namespace Tetris
 		screenWidth = Core::Application::Get().GetSpec().ScreenWidth;
 		screenHeight = Core::Application::Get().GetSpec().ScreenHeight;
 		screenSize[0] = screenWidth; screenSize[1] = screenHeight;
+
+		Core::Particle p = Core::Particle{ Vector2{100, 100},
+											Vector2{0},
+											Vector2{100, 100},
+											Vector2{50, 60},
+											WHITE,
+											Color{255, 255, 255, 0},
+											0.f,
+											10.f,
+											100.f};
+		particleSystem.addParticle(p);
 	}
 
 	
@@ -125,8 +137,11 @@ namespace Tetris
 		m_Tetris.drawSavedTetronimo(renderer, 11, 11, 1);
 		
 		
+
 		// TODO: MAKE THIS TAKE POSITIONS
 		
+		particleSystem.drawParticles();
+
 		//EndMode2D();
 		
 		 
@@ -139,6 +154,7 @@ namespace Tetris
 	}
 	void GameScene::OnUpdate(float ts)
 	{
+		particleSystem.onUpdate(ts);
 
 		time += ts;
 		m_Tetris.Tick(ts);
@@ -162,9 +178,24 @@ namespace Tetris
 	}
 		if (IsKeyPressed(KEY_DOWN))
 			{
+				// TODO Temporary
+				for (int i = m_Tetris.currentPos.y; i < GRID_HEIGHT; i++)
+				{
+					particleSystem.addParticle(Core::Particle{ Vector2{(float)(m_Tetris.currentPos.x + 2) * SQUARE_SIZE, (float)i * 32},
+											Vector2{0},
+											Vector2{15, 15},
+											Vector2{1, 1},
+											m_Tetris.colors[m_Tetris.currentTetronimo],
+											Color{255, 255, 255, 0},
+											0.f,
+											(float)i,
+											0.f });
+				}
 				m_Tetris.onInputSpeedPlacePressed();
 				/*m_Tetris.combineGridTetronimoDepth(gridAndCurrentDepth);*/
 				timePlaced = time;
+				
+
 			}
 		if (IsKeyPressed(KEY_SPACE))
 		{
