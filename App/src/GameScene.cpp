@@ -81,7 +81,7 @@ namespace Tetris
 		m_Camera.rotation = 0.0f;
 		m_Camera.zoom = 1.0f;
 
-
+		
 
 
 	}
@@ -130,7 +130,7 @@ namespace Tetris
 			SetShaderValue(spinShader, centreLoc, &upcomingTPos1, SHADER_UNIFORM_VEC2);
 			m_Tetris.drawUpcomingTetronimo(renderer, 1, 11, 0, 1);
 		EndShaderMode();
-		m_ParticleSystem.drawParticles();
+		m_Tetris.getParticleSystem().drawParticles();
 
 		
 
@@ -154,7 +154,7 @@ namespace Tetris
 	}
 	void GameScene::OnUpdate(float ts)
 	{
-		m_ParticleSystem.onUpdate(ts);
+		m_Tetris.getParticleSystem().onUpdate(ts);
 
 		time += ts;
 		m_Tetris.Tick(ts);
@@ -190,7 +190,7 @@ namespace Tetris
 				/*
 				for (int i = m_Tetris.trailStart.y; i < m_Tetris.trailEndY; i++)
 				{
-					particleSystem.addParticle(Core::Particle{ Vector2{(float)(m_Tetris.minPos.x+m_Tetris.trailStart.x) * SQUARE_SIZE, (float)i * 32},
+					m_ParticleSystem.addParticle(Core::Particle{ Vector2{(float)(m_Tetris.minPos.x+m_Tetris.trailStart.x) * SQUARE_SIZE, (float)i * 32},
 											Vector2{0, 100},
 											Vector2{10, 10},
 											Vector2{1, 1},
@@ -198,9 +198,9 @@ namespace Tetris
 											Color{255, 255, 255, 0},
 											(float)0,
 											32.f - i,
-											0.f });
-				}
-				*/
+											0.f , 100.0f});
+				}*/
+				
 
 		}
 		if (IsKeyPressed(KEY_SPACE))

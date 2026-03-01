@@ -17,7 +17,8 @@ namespace Core
 		Color colorEnd;
 		float age;
 		float lifetime = 1.0f;
-		float rotation;
+		float rotationStart;
+		float rotationEnd;
 	};
 
 	constexpr int MAX_PARTICLE_COUNT = 100;

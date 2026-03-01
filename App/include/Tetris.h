@@ -9,6 +9,8 @@
 #include <string>
 
 #include <RendererAdapter.h> // from Core
+#include <ParticleSystem.h>
+#include <ParticleSystem.h>
 
 // make it dependent from raylib
 
@@ -131,7 +133,9 @@ namespace Tetris
 		Color trailColor = colors[currentTetronimo];
 
 		Vector2 minPos;
-		Vector3 maxPos;
+		Vector2 maxPos;
+
+		Core::ParticleSystem particleSystem;
 		
 
 	
@@ -449,7 +453,27 @@ namespace Tetris
 					linesFull[y] = true;
 					combo++;
 
+					for (int x = 0; x < GRID_WIDTH; x++)
+					{
+						Core::Particle p;
+						p.pos = Vector2{ (float)(x + grid.pos.x + 0.5f) * SQUARE_SIZE, float(y + 1 - 0.5f) * SQUARE_SIZE };
+						p.velocity = Vector2{ 0, 0 };
+						p.sizeStart = Vector2{ SQUARE_SIZE, SQUARE_SIZE };
+						//p.sizeEnd = Vector2{ 1, 1 };
+						p.sizeEnd = Vector2{SQUARE_SIZE, SQUARE_SIZE};
+						p.colorStart = WHITE;
+						p.colorEnd = Color{255, 255, 255, 0};
+						p.age = 0.0f;
+						//p.age = (x) / GRID_WIDTH;
+						p.lifetime = 1.0f;
+						p.rotationStart = 0.f;
+						p.rotationEnd = 0.0f;
+
+						createParticle(p);
+					}
+
 				}
+				
 			}
 
 			score += combo * 4;
@@ -465,6 +489,7 @@ namespace Tetris
 						grid.getDepth(x, write_y) = grid.getDepth(x, y);
 
 
+
 					}
 					write_y--;
 				}
@@ -472,6 +497,16 @@ namespace Tetris
 			}
 			
 			
+		}
+
+		 Core::ParticleSystem& getParticleSystem()
+		{
+			return particleSystem;
+		}
+
+		void createParticle(const Core::Particle& p)
+		{
+			particleSystem.addParticle(p);
 		}
 	};
 

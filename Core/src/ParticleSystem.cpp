@@ -13,10 +13,15 @@ namespace Core
 	{
 		for (const auto& p : m_Particles)
 		{
-			Color c = ColorLerp(p.colorStart, p.colorEnd, p.age);
-			Vector2 size = Vector2Lerp(p.sizeStart, p.sizeEnd, p.age);
+			float t = p.age / p.lifetime;
+			Color c = ColorLerp(p.colorStart, p.colorEnd, t);
+			Vector2 size = Vector2Lerp(p.sizeStart, p.sizeEnd, t);
+			float rot = Lerp(p.rotationStart, p.rotationEnd, t);
 
-			DrawRectanglePro(Rectangle{ p.pos.x - size.x, p.pos.y - size.y, size.x, size.y }, Vector2{0.0, 0.0 }, p.rotation, c);
+			Rectangle rect = { p.pos.x, p.pos.y, size.x, size.y };
+			Vector2 origin = { size.x * 0.5f, size.y * 0.5f };
+
+			DrawRectanglePro(rect, origin, rot, c);
 		}
 	}
 
