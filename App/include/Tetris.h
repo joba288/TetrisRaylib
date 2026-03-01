@@ -260,26 +260,27 @@ namespace Tetris
 		}
 		void drawGUITetronimo(Core::RendererAdapter& r, TETRONIMO t, int posX, int posY, float scale)
 		{
-			int sSize = SQUARE_SIZE * scale;
+			float sSize = SQUARE_SIZE * scale;
+
+			float baseX = posX * SQUARE_SIZE;
+			float baseY = posY * SQUARE_SIZE;
+
 			for (int y = 0; y < 4; y++)
 			{
 				for (int x = 0; x < 4; x++)
 				{
-
 					int currentSquare = tetronimos[TETRONIMO_INDEX(t, 1, x, y)];
-					//if (currentSquare != 0)
-					//{
-						Color c = colors[currentSquare];
-						if (currentSquare == 0)
-							r.drawRectangle(x * sSize + posX * sSize,
-								y * sSize + posY * sSize, sSize,
-								sSize, c.r, c.g, c.b, c.a); // TODO Fix Scaling
-						else
-							r.drawTexture(
-								x * sSize + posX * sSize,
-								y * sSize + posY * sSize, scale, c.r, c.g, c.b, 255);
+					Color c = colors[currentSquare];
 
-					//}
+					float px = baseX + x * sSize;
+					float py = baseY + y * sSize;
+
+					if (currentSquare == 0)
+					{}
+						//r.drawRectangle(px, py, sSize, sSize, c.r, c.g, c.b, c.a);
+						
+					else
+						r.drawTexture(px, py, scale, c.r, c.g, c.b, 255);
 				}
 			}
 		}
@@ -457,11 +458,11 @@ namespace Tetris
 					{
 						Core::Particle p;
 						p.pos = Vector2{ (float)(x + grid.pos.x + 0.5f) * SQUARE_SIZE, float(y + 1 - 0.5f) * SQUARE_SIZE };
-						p.velocity = Vector2{ 0, 0 };
+						p.velocity = Vector2{ 0, 32 };
 						p.sizeStart = Vector2{ SQUARE_SIZE, SQUARE_SIZE };
 						//p.sizeEnd = Vector2{ 1, 1 };
 						p.sizeEnd = Vector2{SQUARE_SIZE, SQUARE_SIZE};
-						p.colorStart = WHITE;
+						p.colorStart = RAYWHITE;
 						p.colorEnd = Color{255, 255, 255, 0};
 						p.age = 0.0f;
 						//p.age = (x) / GRID_WIDTH;

@@ -126,17 +126,64 @@ namespace Tetris
 		EndShaderMode();
 
 		BeginShaderMode(spinShader);
-			Vector2 upcomingTPos1 = { 332 + (4 * 16), (4 * 16) };
-			SetShaderValue(spinShader, centreLoc, &upcomingTPos1, SHADER_UNIFORM_VEC2);
-			m_Tetris.drawUpcomingTetronimo(renderer, 1, 11, 0, 1);
+
+		float scale = .75f;
+
+		Vector2 pos = {
+			11 * SQUARE_SIZE,
+			1 * SQUARE_SIZE
+		};
+
+		float blockSize = SQUARE_SIZE * scale;
+
+		Vector2 centre = {
+			pos.x + blockSize * 2.0f,
+			pos.y + blockSize * 2.0f
+		};
+
+		SetShaderValue(spinShader, centreLoc, &centre, SHADER_UNIFORM_VEC2);
+
+		m_Tetris.drawUpcomingTetronimo(
+			renderer,
+			1,
+			pos.x / SQUARE_SIZE,
+			pos.y / SQUARE_SIZE,
+			scale
+		);
+
+		
 		EndShaderMode();
 		m_Tetris.getParticleSystem().drawParticles();
 
-		
+		BeginShaderMode(spinShader);
+		scale = .75f;
+
+		pos = {
+			11 * SQUARE_SIZE,
+			5 * SQUARE_SIZE
+		};
 
 
-		m_Tetris.drawUpcomingTetronimo(renderer, 2, 32, 0, 0.5);
-		m_Tetris.drawSavedTetronimo(renderer, 11, 11, 1);
+		blockSize = SQUARE_SIZE * scale;
+		centre = {
+			pos.x + blockSize * 2.0f,
+			pos.y + blockSize * 2.0f
+		};
+
+		SetShaderValue(spinShader, centreLoc, &centre, SHADER_UNIFORM_VEC2);
+		m_Tetris.drawUpcomingTetronimo(
+			renderer,
+			2,
+			pos.x / SQUARE_SIZE,
+			pos.y / SQUARE_SIZE,
+			scale
+		);
+		EndShaderMode();
+
+
+
+
+		m_Tetris.drawSavedTetronimo(renderer, -4, 17, .75);
 		
 		
 
