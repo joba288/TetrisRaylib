@@ -21,6 +21,6 @@ int main()
     application.GetAssetManager().addShader("Trail", "resources/vsBase.glsl", "resources/fsTrail.glsl");
     application.GetAssetManager().addShader("Pulsate", "resources/vsPulsate.glsl", "resources/fsBase.glsl");
 
-    application.GotoScene(1);
+    application.GotoScene(0);
     application.Run();
 }

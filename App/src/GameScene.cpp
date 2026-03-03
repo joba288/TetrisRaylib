@@ -17,6 +17,7 @@ namespace Tetris
 
 	void GameScene::Init()
 	{
+		m_Tetris = Tetris();
 		m_Tetris.grid.initDepthGrid();
 
 		// INJECT SHADER HEADER
