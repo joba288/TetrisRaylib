@@ -91,7 +91,7 @@ namespace Tetris
 	{
 
 		Grid grid;
-
+		bool gameOver = false;
 		unsigned int score = 0;
 
 		TETRONIMO currentTetronimo = IBlock;
@@ -392,6 +392,10 @@ namespace Tetris
 			currentTetronimo = upcomingTetronimos[currentTetronimoIndex]; //				set the next tetronimo as current
 			upcomingTetronimos[currentTetronimoIndex] = TETRONIMO(rand() % (7) + 1); //		get new random tetronimo
 			quickPlacePos = getLandingPosition();
+
+			if (checkCollision(currentPos))
+				gameOver = true;
+			
 		}
 
 		void initNextTetronimo(TETRONIMO t)
@@ -403,6 +407,9 @@ namespace Tetris
 			currentTetronimo = t; //				set the next tetronimo as current
 			upcomingTetronimos[currentTetronimoIndex] = TETRONIMO(rand() % (7) + 1); //		get new random tetronimo
 			quickPlacePos = getLandingPosition();
+
+			if (checkCollision(currentPos))
+				gameOver = true;
 		}
 
 		ivec2 getLandingPosition()

@@ -226,7 +226,8 @@ namespace Tetris
 
 		shakeCamera(ts);
 
-
+		if (m_Tetris.gameOver)
+			Core::Application::Get().GetSceneManager().NextScene();
 
 		if (IsKeyPressed(KEY_UP))
 		{
