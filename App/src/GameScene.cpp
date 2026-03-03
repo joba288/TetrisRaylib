@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <array>
 #include <ParticleSystem.h>
+#include <PauseScene.h>
 
 namespace Tetris
 {
@@ -272,6 +273,9 @@ namespace Tetris
 			m_Tetris.onInputSaveTetronimoPressed();
 			/*m_Tetris.combineGridTetronimoDepth(gridAndCurrentDepth);*/
 		}
+
+		if (IsKeyPressed(KEY_P))
+			Core::Application::Get().GetSceneManager().PushScene<PauseScene>();
 		
 	}
 
