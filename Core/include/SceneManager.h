@@ -1,4 +1,5 @@
 #include <vector>
+#include <stack>
 #include <memory>
 #include <type_traits>
 
@@ -36,12 +37,27 @@ namespace Core {
 			requires(std::is_base_of_v<Scene, TScene>)
 			inline void PushScene() 
 			{
-				m_Scenes.push_back(std::make_unique<TScene>());
+				//m_Scenes.push_back(std::make_unique<TScene>());//
+				m_SceneStack.push_back(std::make_shared<TScene>());
+				m_SceneStack.back()->Init();
+			}
+			void PopScene()
+			{
+				m_SceneStack.pop_back();
+			}
+
+			template<typename TScene>
+			requires(std::is_base_of_v<Scene, TScene>)
+			inline void AddSceneToSequence()
+			{
+				m_ScenesSequence.push_back(std::make_shared<TScene>());
 			}
 
 		private:
 			int m_CurrentScene = 0;
-			std::vector<std::unique_ptr<Scene>> m_Scenes;
+			std::vector<std::shared_ptr<Scene>> m_ScenesSequence;
+			std::vector<std::shared_ptr<Scene>> m_SceneStack;
+			
 			
 			
 			

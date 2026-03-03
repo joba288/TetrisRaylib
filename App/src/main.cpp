@@ -11,9 +11,10 @@ int main()
 
     Core::ApplicationSpec appSpec = {"Tetris", 1080, 720};
     Core::Application application(appSpec);
-    application.GetSceneManager().PushScene<Tetris::MenuScene>();
-    application.GetSceneManager().PushScene<Tetris::GameScene>();
-    application.GetSceneManager().PushScene<Tetris::DeathScene>();
+    application.GetSceneManager().AddSceneToSequence<Tetris::MenuScene>();
+    application.GetSceneManager().AddSceneToSequence<Tetris::GameScene>();
+    application.GetSceneManager().AddSceneToSequence<Tetris::DeathScene>();
+
 
     application.addTexture("Block", "resources/squareTexture.jpg");
     application.GetAssetManager().addShader("Spin", "resources/vsSpin.glsl", "resources/fsBase.glsl");

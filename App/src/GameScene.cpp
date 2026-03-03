@@ -204,7 +204,7 @@ namespace Tetris
 		EndShaderMode();
 		
 
-		// TODO: MAKE THIS TAKE POSITIONS
+		
 		EndMode2D();
 
 		 

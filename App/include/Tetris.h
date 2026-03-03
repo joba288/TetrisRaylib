@@ -12,7 +12,7 @@
 #include <ParticleSystem.h>
 #include <ParticleSystem.h>
 
-// make it dependent from raylib
+// make it independent to raylib
 
 
 // TODO:
@@ -20,28 +20,19 @@
 //  GAMEPLAY
 // - Death - lose condition
 // - Speeding up of interval - difficulty
-// - Clean up code - make code specific to tetris.h rahyhghdgh etc
 // - Saving Tetronimos
-// - Points
 // - Pause Menu
-// - Rotate fix bug
-// - 
 // 
 // POLISH
-// - Camera
-// - Camera Shake
-// - Textures
+
 // - Music
 // - SFX
-// - Shaders - screen space shadows, tetronimo depth
 // - Animation
 // - trail when quick place
 // 
 // SYSTEMS
-// - AssetManager
 // - UI System
 // - Change Scenes to work more like layers
-// - Shaders
 // 
 // OPENGL PORT
 // FIX CMAKE - MAKE IT BUILD ON ANY SYSTEM
