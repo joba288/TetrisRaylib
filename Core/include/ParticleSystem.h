@@ -30,9 +30,9 @@ namespace Core
 				m_Particles.reserve(MAX_PARTICLE_COUNT);
 			}
 			~ParticleSystem() = default;
-			void onUpdate(float ts);
-			void drawParticles();
-			void addParticle(const Particle& p);
+			void OnUpdate(float ts);
+			void DrawParticles();
+			void AddParticle(const Particle& p);
 		private:
 			std::vector<Particle> m_Particles;
 	};

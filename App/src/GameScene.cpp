@@ -85,9 +85,6 @@ namespace Tetris
 		m_Camera.rotation = 0.0f;
 		m_Camera.zoom = 1.0f;
 
-		
-
-
 	}
 
 	
@@ -157,7 +154,7 @@ namespace Tetris
 
 		
 		EndShaderMode();
-		m_Tetris.getParticleSystem().drawParticles();
+		m_Tetris.getParticleSystem().DrawParticles();
 
 		BeginShaderMode(spinShader);
 		scale = .75f;
@@ -213,13 +210,14 @@ namespace Tetris
 		//GUI
 		m_Tetris.drawScore(renderer);
 		//DrawText(std::to_string(m_ShakeTime).c_str(), 100, 100, 64, BLACK);
-
+		m_UISystem.Draw();
 
 
 	}
 	void GameScene::OnUpdate(float ts)
 	{
-		m_Tetris.getParticleSystem().onUpdate(ts);
+		m_Tetris.getParticleSystem().OnUpdate(ts);
+		m_UISystem.OnUpdate(ts);
 
 		time += ts;
 		m_Tetris.Tick(ts);

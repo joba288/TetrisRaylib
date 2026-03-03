@@ -3,6 +3,7 @@
 #include "Tetris.h"
 #include "RaylibRenderer.h"
 #include "ParticleSystem.h"
+#include <UISystem.h>
 
 namespace Tetris {
 	class GameScene : public Core::Scene
@@ -20,7 +21,7 @@ namespace Tetris {
 
 	private:
 		Tetris m_Tetris;
-		Core::ParticleSystem m_ParticleSystem;
+		Core::UISystem m_UISystem;
 		Camera2D m_Camera = { 0 };
 		Vector2 m_BaseCamOffset = {0};
 		Vector2 m_Screenshake = {0};

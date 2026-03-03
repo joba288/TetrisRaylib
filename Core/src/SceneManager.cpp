@@ -27,7 +27,7 @@ namespace Core
 
 	void SceneManager::PreviousScene()
 	{
-		m_CurrentScene = std::max(m_CurrentScene - 1, (int)m_ScenesSequence.size());
+		m_CurrentScene = std::max(m_CurrentScene - 1, 0);
 		m_SceneStack.empty();
 		m_SceneStack.push_back(m_ScenesSequence[m_CurrentScene]);
 		m_SceneStack.back()->Init();

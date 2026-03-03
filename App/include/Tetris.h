@@ -498,7 +498,7 @@ namespace Tetris
 
 		void createParticle(const Core::Particle& p)
 		{
-			particleSystem.addParticle(p);
+			particleSystem.AddParticle(p);
 		}
 	};
 

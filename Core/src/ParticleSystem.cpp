@@ -4,12 +4,12 @@
 
 namespace Core
 {
-	void ParticleSystem::addParticle(const Particle& p)
+	void ParticleSystem::AddParticle(const Particle& p)
 	{
 		m_Particles.push_back(p);
 	}
 
-	void ParticleSystem::drawParticles()
+	void ParticleSystem::DrawParticles()
 	{
 		for (const auto& p : m_Particles)
 		{
@@ -25,7 +25,7 @@ namespace Core
 		}
 	}
 
-	void ParticleSystem::onUpdate(float ts)
+	void ParticleSystem::OnUpdate(float ts)
 	{
 		for (auto& p : m_Particles)
 		{
