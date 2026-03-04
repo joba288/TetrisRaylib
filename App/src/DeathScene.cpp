@@ -21,13 +21,13 @@ namespace Tetris {
 
         m_UISystem.AddComponent("Title", Core::UIComponentData{ screenWidth / 2, 0, 200, 100, 0, true, "You Died", 50, BLACK, Color{0,0,0,0}, Color{0,0,0,0} });
         m_UISystem.AddComponent("Resume Button", m_PlayButton);
-        m_UISystem.AddComponent("Exit Button", m_ExitButton);
+        m_UISystem.AddComponent("Exit Button", m_ExitButton); // TODO Unload on scene change
     }
 
     void DeathScene::OnRender()
     {
 
-        int screenWidth = 1080;
+        ClearBackground(RAYWHITE);
 
         m_UISystem.Draw();
 

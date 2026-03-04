@@ -56,6 +56,34 @@ void Tetris::RaylibRenderer::drawTexture(int x, int y, float scale, unsigned cha
     
 }
 
+void Tetris::RaylibRenderer::drawTexture(int x, int y, int w, int h, float scale, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+{
+
+    float width = w * scale;
+    float height = h * scale;
+
+    Rectangle source{ 0,0,(float)tex.width,(float)tex.height };
+
+    Vector2 origin{ width / 2.0f, height / 2.0f };
+
+    Rectangle dest{
+        x + origin.x,
+        y + origin.y,
+        width,
+        height
+    };
+
+    DrawTexturePro(
+        tex,
+        source,
+        dest,
+        origin,
+        0.0f,
+        Color{ r,g,b,a }
+    );
+
+}
+
 void Tetris::RaylibRenderer::LoadTexture(const std::string& assetName)
 {
     tex = Core::Application::Get().getTexture(assetName);

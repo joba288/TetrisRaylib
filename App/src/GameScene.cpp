@@ -17,6 +17,9 @@ namespace Tetris
 
 	void GameScene::Init()
 	{
+
+		Core::Application::Get().PushAlarm(Core::Alarm([]() {std::cout<<"Alarm Finished";}, 5.0f));
+
 		m_Tetris = Tetris();
 		m_Tetris.grid.initDepthGrid();
 

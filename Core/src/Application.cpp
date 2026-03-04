@@ -50,6 +50,16 @@ namespace Core
 			float timestep = std::clamp(currentTime - lastTime, 0.001f, 0.1f);
 			lastTime = currentTime;
 
+			for (auto& a : m_Alarms)
+			{
+				a.age += timestep;
+				if (a.age >= a.duration && a.age != -1.0f)
+				{
+					a.age = -1.f;
+					a.OnFinish();
+				}
+			}
+
 			//Update
 			m_SceneManager.OnUpdate(timestep);
 			//Render

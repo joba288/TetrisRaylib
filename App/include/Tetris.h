@@ -10,7 +10,9 @@
 
 #include <RendererAdapter.h> // from Core
 #include <ParticleSystem.h>
-#include <ParticleSystem.h>
+#include <raymath.h>
+#include <iostream>
+
 
 // make it independent to raylib
 
@@ -18,10 +20,8 @@
 // TODO:
 //
 //  GAMEPLAY
-// - Death - lose condition
 // - Speeding up of interval - difficulty
-// - Saving Tetronimos
-// - Pause Menu
+// - Saving Tetronimos Fix
 // 
 // POLISH
 
@@ -29,13 +29,6 @@
 // - SFX
 // - Animation
 // - trail when quick place
-// 
-// SYSTEMS
-// - UI System
-// - Change Scenes to work more like layers
-// 
-// OPENGL PORT
-// FIX CMAKE - MAKE IT BUILD ON ANY SYSTEM
 
 
 
@@ -107,6 +100,9 @@ namespace Tetris
 		int trailRot = 0;
 		TETRONIMO trailTetronimo = currentTetronimo;
 
+		int stretchHeight = 4 * SQUARE_SIZE;
+		bool placing = false;
+
 		int currentShape; 
 
 		std::array<TETRONIMO, 3> upcomingTetronimos = { TETRONIMO(rand() % (7) + 1 ),
@@ -169,6 +165,7 @@ namespace Tetris
 			trailRot = currentRotation;
 			trailTetronimo = currentTetronimo;
 			currentPos = quickPlacePos;
+			placing = true;
 			
 		}
 		void onInputSaveTetronimoPressed()
@@ -224,6 +221,40 @@ namespace Tetris
 		{
 			// Draws the current tetronimo at its grid position, as well as the place where it will land
 
+			//stretchHeight = Lerp(stretchHeight, ((((quickPlacePos.y ) - currentPos.y))) * SQUARE_SIZE, 0.1);
+
+			// width and height of one square in tetronimo
+			int w = 1; int h = 1;
+			
+			minPos = { 4,4 };
+			maxPos = { -1,-1 };
+
+			for (int y = 0; y < 4; y++)
+			{
+				for (int x = 0; x < 4; x++)
+				{
+					int currentSquare = tetronimos[TETRONIMO_INDEX(currentTetronimo, currentRotation, x, y)]; // TODO Cache this somewhere
+					if (currentSquare != 0)
+					{
+						if (x < minPos.x) minPos.x = x;
+						if (y < minPos.y) minPos.y = y;
+						if (x > maxPos.x) maxPos.x = x;
+						if (y > maxPos.y) maxPos.y = y;
+					}
+				}
+			}
+
+			int pieceHeight = (maxPos.y - minPos.y + 1);
+			int dropDistance = quickPlacePos.y - currentPos.y;
+
+			// Total height in grid units
+			int totalHeight = pieceHeight + dropDistance;
+
+			// Scale factor per tile
+			h = totalHeight / pieceHeight;
+
+
+
 			for (int y = 0; y < 4; y++)
 			{
 				for (int x = 0; x < 4; x++)
@@ -232,9 +263,18 @@ namespace Tetris
 
 					if (currentSquare != 0)
 					{
-						Color c = colors[currentSquare];
-						r.drawTexture(x * SQUARE_SIZE + currentPos.x * SQUARE_SIZE, y * SQUARE_SIZE + currentPos.y * SQUARE_SIZE,1, c.r, c.g, c.b, c.a);
-						r.drawTexture(x * SQUARE_SIZE + quickPlacePos.x * SQUARE_SIZE, y * SQUARE_SIZE + quickPlacePos.y * SQUARE_SIZE,1, c.r, c.g, c.b, 125);					}
+
+					int drawY = (currentPos.y + minPos.y) * SQUARE_SIZE
+						+ (y - minPos.y) * SQUARE_SIZE * h;
+						Color c = colors[currentTetronimo];
+						r.drawTexture((x + currentPos.x) * w * SQUARE_SIZE,
+									  drawY,
+									  w * SQUARE_SIZE, h * SQUARE_SIZE, 1, c.r, c.g, c.b, c.a);
+						// Landing pos
+						r.drawTexture(x * SQUARE_SIZE + quickPlacePos.x * SQUARE_SIZE,
+									  y * SQUARE_SIZE + quickPlacePos.y * SQUARE_SIZE,
+							          1, c.r, c.g, c.b, 125);					
+					}
 				}
 			}
 
@@ -335,8 +375,6 @@ namespace Tetris
 			}
 
 		}
-
-
 
 		bool checkCollision(ivec2 pos)
 		{
