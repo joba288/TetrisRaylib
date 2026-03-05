@@ -64,7 +64,7 @@ namespace Tetris {
 		float screenSize[2];// = { screenWidth, screenHeight };
 		int squareSize = SQUARE_SIZE;
 		unsigned int gridSize[2] = { GRID_WIDTH, GRID_HEIGHT };
-
+		
 		std::array<float, GRID_WIDTH* GRID_HEIGHT> gridAndCurrentDepth;
 
 	};

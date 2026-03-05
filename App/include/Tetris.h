@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <array>
 #include <Tetronimos.h>
 #include <raylib.h>
@@ -10,6 +10,7 @@
 
 #include <RendererAdapter.h> // from Core
 #include <ParticleSystem.h>
+#include <Application.h>
 #include <raymath.h>
 #include <iostream>
 
@@ -34,6 +35,8 @@
 
 namespace Tetris
 {
+
+
 	constexpr int SQUARE_SIZE = 32;
 	constexpr int GRID_WIDTH = 10;
 	constexpr int GRID_HEIGHT = 20;
@@ -82,7 +85,6 @@ namespace Tetris
 
 	struct Tetris // Change to class
 	{
-
 		Grid grid;
 		bool gameOver = false;
 		unsigned int score = 0;
@@ -100,8 +102,11 @@ namespace Tetris
 		int trailRot = 0;
 		TETRONIMO trailTetronimo = currentTetronimo;
 
-		int stretchHeight = 4 * SQUARE_SIZE;
+		int stretchHeight = 1;
+		int stretchWidth = 1;
 		bool placing = false;
+		bool moving = false;
+		int moveX = 1;
 
 		int currentShape; 
 
@@ -115,7 +120,9 @@ namespace Tetris
 		float tickTimer = 0.f;
 		float tickInterval = 0.3f;
 
-		std::array<Color, 8> colors = {LIGHTGRAY, SKYBLUE, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED};
+	
+
+		std::array<Color, 8> colors = {GRAY, SKYBLUE, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED};
 
 		Color trailColor = colors[currentTetronimo];
 
@@ -123,49 +130,81 @@ namespace Tetris
 		Vector2 maxPos;
 
 		Core::ParticleSystem particleSystem;
-		
-
+		std::shared_ptr<Core::Alarm> placeAlarm;
+		std::shared_ptr<Core::Alarm> moveAlarm;
 	
 		// INPUT FUNCTIONS
 
 		void onInputRotatePressed()
 		{
-			int previousRotation = currentRotation;
-			currentRotation += 1;
-			currentRotation %= 4;
-			if (checkCollision(currentPos))
-				currentRotation = previousRotation;
+			if (!placing && !moving)
+			{
 
-			quickPlacePos = getLandingPosition();
+				int previousRotation = currentRotation;
+				currentRotation += 1;
+				currentRotation %= 4;
+				if (checkCollision(currentPos))
+					currentRotation = previousRotation;
+
+				quickPlacePos = getLandingPosition();
+			}
 		}
 		void onInputLeftPressed() 
 		{
-			if (!checkCollision({ currentPos.x - 1, currentPos.y }))
+			if (!placing && !moving)
 			{
-				currentPos.x -= 1;
-				
-				quickPlacePos = getLandingPosition();
-				
+				if (!checkCollision({ currentPos.x - 1, currentPos.y }))
+				{
+					moveX = -1;
+					moving = true;
+					moveAlarm = Core::Application::Get().PushAlarm(Core::Alarm([this]()
+					{
+						currentPos.x -= 1;
+
+						quickPlacePos = getLandingPosition();
+						moving = false;
+					}, 0.045f));
+
+				}
 			}
 		}
 		void onInputRightPressed() 
 		{
-			if (!checkCollision({ currentPos.x + 1, currentPos.y }))
+			if (!placing && !moving)
 			{
-				currentPos.x += 1;
-				
-				quickPlacePos = getLandingPosition();
+				if (!checkCollision({ currentPos.x + 1, currentPos.y }))
+				{
+					moveX = 1;
+					moving = true;
+					moveAlarm = Core::Application::Get().PushAlarm(Core::Alarm([this]()
+					{
+						currentPos.x += 1;
 
+						quickPlacePos = getLandingPosition();
+						moving = false;
+					}, 0.045f));
+
+				}
 			}
 		}
 		void onInputSpeedPlacePressed()
 		{
-			trailStart = currentPos; trailEndY = quickPlacePos.y;
-			trailColor = colors[currentTetronimo];
-			trailRot = currentRotation;
-			trailTetronimo = currentTetronimo;
-			currentPos = quickPlacePos;
-			placing = true;
+			if (!placing && !moving)
+			{
+				placing = true;
+				trailStart = currentPos; trailEndY = quickPlacePos.y;
+				trailColor = colors[currentTetronimo];
+				trailRot = currentRotation;
+				trailTetronimo = currentTetronimo;
+
+				placeAlarm = Core::Application::Get().PushAlarm(Core::Alarm([this]()
+				{
+					currentPos = quickPlacePos;
+					placeCurrentTetronimo();
+					placing = false;
+				},0.03f
+					));
+			}
 			
 		}
 		void onInputSaveTetronimoPressed()
@@ -184,18 +223,27 @@ namespace Tetris
 		}
 		void Tick(float ts) 
 		{
-			tickTimer += ts;
-			if (tickTimer > tickInterval)
+			if (!placing && !moving)
 			{
-				tickTimer = 0.f;
-				if (checkCollision({ currentPos.x, currentPos.y + 1 }))
+				tickTimer += ts;
+				if (tickTimer > tickInterval)
 				{
-					placeCurrentTetronimo();
-				}
-				else
-				{
-					currentPos.y += 1;
-					quickPlacePos = getLandingPosition();
+					tickTimer = 0.f;
+					if (checkCollision({ currentPos.x, currentPos.y + 1 }))
+					{
+						placeCurrentTetronimo();
+					}
+					else
+					{
+						
+						
+						
+							currentPos.y += 1;
+
+							quickPlacePos = getLandingPosition();
+							
+						
+					}
 				}
 			}
 		}
@@ -221,10 +269,9 @@ namespace Tetris
 		{
 			// Draws the current tetronimo at its grid position, as well as the place where it will land
 
-			//stretchHeight = Lerp(stretchHeight, ((((quickPlacePos.y ) - currentPos.y))) * SQUARE_SIZE, 0.1);
-
+			
 			// width and height of one square in tetronimo
-			int w = 1; int h = 1;
+			float w = 1; float h = 1;
 			
 			minPos = { 4,4 };
 			maxPos = { -1,-1 };
@@ -243,17 +290,47 @@ namespace Tetris
 					}
 				}
 			}
-
-			int pieceHeight = (maxPos.y - minPos.y + 1);
-			int dropDistance = quickPlacePos.y - currentPos.y;
-
-			// Total height in grid units
-			int totalHeight = pieceHeight + dropDistance;
-
-			// Scale factor per tile
-			h = totalHeight / pieceHeight;
+			
+			int tetronimoWidth = maxPos.x - minPos.x + 1;
+			int tetronimoHeight = maxPos.y - minPos.y + 1;
 
 
+
+			if (placing && placeAlarm && tetronimoHeight > 0)
+			{
+				int startBottom = currentPos.y + maxPos.y;
+				int endBottom = quickPlacePos.y + maxPos.y;
+
+				int distanceToPlace = endBottom - startBottom;
+
+				float targetHeight = 1.15f + (float)distanceToPlace / tetronimoHeight;
+				targetHeight = 1.15f;
+
+				float t = placeAlarm->age / placeAlarm->duration;
+				t = Clamp(t, 0.0f, 1.0f);
+				t = 1.0f - powf(1.0f - t, 3.0f);
+				w = Lerp(1.0f, targetHeight, t);
+				h = Lerp(1.0f, targetHeight, t);
+			}
+
+			if (moving && moveAlarm && tetronimoWidth > 0)
+			{
+				float targetWidth = 1.05f; 
+
+				float t = moveAlarm->age / moveAlarm->duration;
+				t = Clamp(t, 0.0f, 1.0f);
+				t = 1.0f - powf(1.0f - t, 3.0f);
+
+				h = Lerp(1.0f, targetWidth, t);
+				w = Lerp(1.0f, targetWidth, t);
+			}
+			
+			
+			
+			
+			
+			
+			
 
 			for (int y = 0; y < 4; y++)
 			{
@@ -263,16 +340,33 @@ namespace Tetris
 
 					if (currentSquare != 0)
 					{
+						float piecePixelWidth = tetronimoWidth * SQUARE_SIZE;
+						float piecePixelHeight = tetronimoHeight * SQUARE_SIZE;
 
-					int drawY = (currentPos.y + minPos.y) * SQUARE_SIZE
-						+ (y - minPos.y) * SQUARE_SIZE * h;
+						float baseX = (currentPos.x + minPos.x) * SQUARE_SIZE;
+						float baseY = (currentPos.y + minPos.y) * SQUARE_SIZE;
+
+						float centerX = baseX + piecePixelWidth * 0.5f;
+						float centerY = baseY + piecePixelHeight * 0.5f;
+
+						float localX = (x - minPos.x) * SQUARE_SIZE;
+						float localY = (y - minPos.y) * SQUARE_SIZE;
+
+						float scaledX = localX * w;
+						float scaledY = localY * h;
+
+						float drawX = centerX + scaledX - (piecePixelWidth * w) * 0.5f;
+						float drawY = centerY + scaledY - (piecePixelHeight * h) * 0.5f;
+
 						Color c = colors[currentTetronimo];
-						r.drawTexture((x + currentPos.x) * w * SQUARE_SIZE,
-									  drawY,
-									  w * SQUARE_SIZE, h * SQUARE_SIZE, 1, c.r, c.g, c.b, c.a);
+						r.drawTexture(drawX,
+							drawY,
+							w * SQUARE_SIZE + 1,
+							h * SQUARE_SIZE + 1,
+							1, c.r, c.g, c.b, c.a);
 						// Landing pos
-						r.drawTexture(x * SQUARE_SIZE + quickPlacePos.x * SQUARE_SIZE,
-									  y * SQUARE_SIZE + quickPlacePos.y * SQUARE_SIZE,
+						r.drawTexture(drawX,
+									  y * SQUARE_SIZE + quickPlacePos.y * SQUARE_SIZE, w * SQUARE_SIZE+1, SQUARE_SIZE,
 							          1, c.r, c.g, c.b, 125);					
 					}
 				}
@@ -311,10 +405,40 @@ namespace Tetris
 						//r.drawRectangle(px, py, sSize, sSize, c.r, c.g, c.b, c.a);
 						
 					else
+					{
 						r.drawTexture(px, py, scale, c.r, c.g, c.b, 255);
+
+						// Check neighbors
+						auto get = [&](int nx, int ny)
+						{
+							if (nx < 0 || nx >= 4 || ny < 0 || ny >= 4)
+								return 0;
+							return tetronimos[TETRONIMO_INDEX(t, 1, nx, ny)];
+						};
+
+						float outline = 4.0f;
+
+						// Top
+						if (get(x, y - 1) == 0)
+							r.drawRectangle(px - outline, py - outline, sSize + outline * 2, outline, 255, 255, 255, 255);
+
+						// Bottom
+						if (get(x, y + 1) == 0)
+							r.drawRectangle(px - outline, py + sSize, sSize + outline * 2, outline, 255, 255, 255, 255);
+
+						// Left
+						if (get(x - 1, y) == 0)
+							r.drawRectangle(px - outline, py, outline, sSize, 255, 255, 255, 255);
+
+						// Right
+						if (get(x + 1, y) == 0)
+							r.drawRectangle(px + sSize, py, outline, sSize, 255, 255, 255, 255);
+					
+					}
 				}
 			}
 		}
+
 		void drawScore(Core::RendererAdapter& r)
 		{
 			r.drawText(std::to_string(score).c_str(), 20, 10, 80, 0, 0, 0, 255);

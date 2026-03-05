@@ -23,6 +23,6 @@ int main()
 
 
 
-    application.GotoScene(0);
+    application.GotoScene(1);
     application.Run();
 }

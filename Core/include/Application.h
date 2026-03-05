@@ -14,12 +14,14 @@ namespace Core
 		std::function<void()> OnFinish;
 
 		template <typename AlarmFunc>
+		requires std::convertible_to<AlarmFunc, std::function<void()>>
 		Alarm(AlarmFunc&& f, float duration) 
 			: OnFinish(std::forward<AlarmFunc>(f)),
 			duration(duration){}
 
 		float duration;
 		float age = 0.f;
+		bool active = true;
 	
 	};
 
@@ -42,9 +44,11 @@ namespace Core
 			ApplicationSpec GetSpec() { return m_Specification; };
 
 			//Alarms
-			void PushAlarm(Alarm a)
+			std::shared_ptr<Alarm> PushAlarm(Alarm a)
 			{
-				m_Alarms.push_back(std::move(a));
+				auto alarm = std::make_shared<Alarm>(std::move(a));
+				m_Alarms.push_back(alarm);
+				return alarm;
 			}
 
 			// Scene Manager
@@ -61,7 +65,7 @@ namespace Core
 		private:
 			ApplicationSpec m_Specification;
 			bool m_Running = false;
-			std::vector<Alarm> m_Alarms;
+			std::vector<std::shared_ptr<Alarm>> m_Alarms;
 
 			SceneManager m_SceneManager;
 			AssetManager m_AssetManager;

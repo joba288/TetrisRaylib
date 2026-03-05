@@ -18,8 +18,6 @@ namespace Tetris
 	void GameScene::Init()
 	{
 
-		Core::Application::Get().PushAlarm(Core::Alarm([]() {std::cout<<"Alarm Finished";}, 5.0f));
-
 		m_Tetris = Tetris();
 		m_Tetris.grid.initDepthGrid();
 
@@ -94,7 +92,7 @@ namespace Tetris
 	
 	void GameScene::OnRender()
 	{
-		ClearBackground(RAYWHITE);
+		ClearBackground(DARKGRAY);
 
 		float mouseUV[2] = { GetMouseX(), GetMouseY() };		
 
@@ -147,6 +145,7 @@ namespace Tetris
 		};
 
 		SetShaderValue(spinShader, centreLoc, &centre, SHADER_UNIFORM_VEC2);
+		
 
 		m_Tetris.drawUpcomingTetronimo(
 			renderer,
@@ -167,7 +166,7 @@ namespace Tetris
 			11 * SQUARE_SIZE,
 			5 * SQUARE_SIZE
 		};
-
+		
 
 		blockSize = SQUARE_SIZE * scale;
 		centre = {
@@ -249,25 +248,15 @@ namespace Tetris
 	}
 		if (IsKeyPressed(KEY_DOWN))
 		{
-			setCameraShake(2,0.25f);
+			Core::Application::Get().PushAlarm(Core::Alarm([this]() {
+				setCameraShake(2,0.25f);
+				timePlaced = time;
+			}, 0.03f));
+
+
 			m_Tetris.onInputSpeedPlacePressed();
 			/*m_Tetris.combineGridTetronimoDepth(gridAndCurrentDepth);*/
-			timePlaced = time;
-
-				// TODO Temporary
-				/*
-				for (int i = m_Tetris.trailStart.y; i < m_Tetris.trailEndY; i++)
-				{
-					m_ParticleSystem.addParticle(Core::Particle{ Vector2{(float)(m_Tetris.minPos.x+m_Tetris.trailStart.x) * SQUARE_SIZE, (float)i * 32},
-											Vector2{0, 100},
-											Vector2{10, 10},
-											Vector2{1, 1},
-											m_Tetris.colors[m_Tetris.currentTetronimo],
-											Color{255, 255, 255, 0},
-											(float)0,
-											32.f - i,
-											0.f , 100.0f});
-				}*/
+			
 				
 
 		}

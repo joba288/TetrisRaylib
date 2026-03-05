@@ -52,11 +52,14 @@ namespace Core
 
 			for (auto& a : m_Alarms)
 			{
-				a.age += timestep;
-				if (a.age >= a.duration && a.age != -1.0f)
+				if (a->active)
 				{
-					a.age = -1.f;
-					a.OnFinish();
+					a->age += timestep;
+					if (a->age >= a->duration)
+					{
+						a->active = false;
+						a->OnFinish();
+					}
 				}
 			}
 
