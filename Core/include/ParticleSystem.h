@@ -10,15 +10,15 @@ namespace Core
 	struct Particle
 	{
 		Vector2 pos;
-		Vector2 velocity;
+		Vector2 velocity = {0,0};
 		Vector2 sizeStart;
 		Vector2 sizeEnd;
-		Color colorStart;
-		Color colorEnd;
-		float age;
+		Color colorStart = WHITE;
+		Color colorEnd = WHITE;
+		float age = 0.0f;
 		float lifetime = 1.0f;
-		float rotationStart;
-		float rotationEnd;
+		float rotationStart = 0.f;
+		float rotationEnd = 0.f;
 	};
 
 	constexpr int MAX_PARTICLE_COUNT = 100;

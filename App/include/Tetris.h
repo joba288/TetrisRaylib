@@ -58,6 +58,8 @@ namespace Tetris
 
 	};
 
+
+
 	constexpr int TETRONIMO_INDEX(int i, int rotation, int x, int y)
 	{
 		return (((i - 1) * 4 + rotation) * 16 + (y * 4 + x));
@@ -106,7 +108,11 @@ namespace Tetris
 		int stretchWidth = 1;
 		bool placing = false;
 		bool moving = false;
-		int moveX = 1;
+		bool alarmOngoing = false;
+		
+
+
+		
 
 		int currentShape; 
 
@@ -137,7 +143,7 @@ namespace Tetris
 
 		void onInputRotatePressed()
 		{
-			if (!placing && !moving)
+			if (!moving && !alarmOngoing)
 			{
 
 				int previousRotation = currentRotation;
@@ -151,16 +157,14 @@ namespace Tetris
 		}
 		void onInputLeftPressed() 
 		{
-			if (!placing && !moving)
+			if (!moving && !alarmOngoing)
 			{
 				if (!checkCollision({ currentPos.x - 1, currentPos.y }))
 				{
-					moveX = -1;
 					moving = true;
 					moveAlarm = Core::Application::Get().PushAlarm(Core::Alarm([this]()
 					{
 						currentPos.x -= 1;
-
 						quickPlacePos = getLandingPosition();
 						moving = false;
 					}, 0.045f));
@@ -170,16 +174,14 @@ namespace Tetris
 		}
 		void onInputRightPressed() 
 		{
-			if (!placing && !moving)
+			if (!moving && !alarmOngoing)
 			{
 				if (!checkCollision({ currentPos.x + 1, currentPos.y }))
 				{
-					moveX = 1;
 					moving = true;
 					moveAlarm = Core::Application::Get().PushAlarm(Core::Alarm([this]()
 					{
 						currentPos.x += 1;
-
 						quickPlacePos = getLandingPosition();
 						moving = false;
 					}, 0.045f));
@@ -189,9 +191,9 @@ namespace Tetris
 		}
 		void onInputSpeedPlacePressed()
 		{
-			if (!placing && !moving)
+			if (!moving && !alarmOngoing)
 			{
-				placing = true;
+				moving = true;
 				trailStart = currentPos; trailEndY = quickPlacePos.y;
 				trailColor = colors[currentTetronimo];
 				trailRot = currentRotation;
@@ -201,7 +203,7 @@ namespace Tetris
 				{
 					currentPos = quickPlacePos;
 					placeCurrentTetronimo();
-					placing = false;
+					moving = false;
 				},0.03f
 					));
 			}
@@ -211,7 +213,6 @@ namespace Tetris
 		{
 			if (savedTetronimo == 0) // None Saved
 			{
-				
 				savedTetronimo = currentTetronimo;
 				initNextTetronimo();
 			}
@@ -223,7 +224,7 @@ namespace Tetris
 		}
 		void Tick(float ts) 
 		{
-			if (!placing && !moving)
+			if (!moving && !alarmOngoing)
 			{
 				tickTimer += ts;
 				if (tickTimer > tickInterval)
@@ -236,12 +237,8 @@ namespace Tetris
 					else
 					{
 						
-						
-						
-							currentPos.y += 1;
-
-							quickPlacePos = getLandingPosition();
-							
+						currentPos.y += 1;
+						quickPlacePos = getLandingPosition();
 						
 					}
 				}
@@ -294,25 +291,6 @@ namespace Tetris
 			int tetronimoWidth = maxPos.x - minPos.x + 1;
 			int tetronimoHeight = maxPos.y - minPos.y + 1;
 
-
-
-			if (placing && placeAlarm && tetronimoHeight > 0)
-			{
-				int startBottom = currentPos.y + maxPos.y;
-				int endBottom = quickPlacePos.y + maxPos.y;
-
-				int distanceToPlace = endBottom - startBottom;
-
-				float targetHeight = 1.15f + (float)distanceToPlace / tetronimoHeight;
-				targetHeight = 1.15f;
-
-				float t = placeAlarm->age / placeAlarm->duration;
-				t = Clamp(t, 0.0f, 1.0f);
-				t = 1.0f - powf(1.0f - t, 3.0f);
-				w = Lerp(1.0f, targetHeight, t);
-				h = Lerp(1.0f, targetHeight, t);
-			}
-
 			if (moving && moveAlarm && tetronimoWidth > 0)
 			{
 				float targetWidth = 1.05f; 
@@ -325,13 +303,6 @@ namespace Tetris
 				w = Lerp(1.0f, targetWidth, t);
 			}
 			
-			
-			
-			
-			
-			
-			
-
 			for (int y = 0; y < 4; y++)
 			{
 				for (int x = 0; x < 4; x++)
@@ -595,6 +566,7 @@ namespace Tetris
 			std::array<bool, GRID_HEIGHT> linesFull{};
 			int combo = 0;
 
+			// Find location of full lines
 			int emptyCount = 0;
 			for (int y = 0; y < GRID_HEIGHT; y++)
 			{
@@ -609,6 +581,7 @@ namespace Tetris
 						break;
 					}
 				}
+
 				if (emptyCount == 0)
 				{
 					linesFull[y] = true;
@@ -616,21 +589,51 @@ namespace Tetris
 
 					for (int x = 0; x < GRID_WIDTH; x++)
 					{
-						Core::Particle p;
-						p.pos = Vector2{ (float)(x + grid.pos.x + 0.5f) * SQUARE_SIZE, float(y + 1 - 0.5f) * SQUARE_SIZE };
-						p.velocity = Vector2{ 0, 32 };
-						p.sizeStart = Vector2{ SQUARE_SIZE, SQUARE_SIZE };
-						//p.sizeEnd = Vector2{ 1, 1 };
-						p.sizeEnd = Vector2{SQUARE_SIZE, SQUARE_SIZE};
-						p.colorStart = RAYWHITE;
-						p.colorEnd = Color{255, 255, 255, 0};
-						p.age = 0.0f;
-						//p.age = (x) / GRID_WIDTH;
-						p.lifetime = 1.0f;
-						p.rotationStart = 0.f;
-						p.rotationEnd = 0.0f;
+						Vector2 _pos = Vector2{ (float)(x + grid.pos.x + 0.5f) * SQUARE_SIZE, float(y + 1 - 0.5f) * SQUARE_SIZE };
 
-						createParticle(p);
+						// Line of particles, the same colour as the background, last until the grid is moved down
+						Core::Particle pEmptyGrid;
+						pEmptyGrid.pos = _pos;
+						pEmptyGrid.sizeStart = Vector2{ SQUARE_SIZE, SQUARE_SIZE };
+						pEmptyGrid.sizeEnd = Vector2{ SQUARE_SIZE, SQUARE_SIZE };
+						pEmptyGrid.colorStart = colors[0];
+						pEmptyGrid.colorEnd = colors[0];
+						pEmptyGrid.lifetime = 0.5f / 2; // TODO Add constants to magic numbers
+						pEmptyGrid.rotationStart = 0.f;
+						pEmptyGrid.rotationEnd = 0.f;
+						particleSystem.AddParticle(pEmptyGrid);
+
+						// Line of white particles, fading out
+						Core::Particle pFade;
+						pFade.pos = _pos;
+						pFade.sizeStart = Vector2{ SQUARE_SIZE-1, SQUARE_SIZE-1 };
+						pFade.sizeEnd = Vector2{ SQUARE_SIZE-1, SQUARE_SIZE-1};
+						pFade.colorStart = Color{255, 255,255, 255};
+						pFade.colorEnd = Color{255, 255, 255, 0};
+						pFade.lifetime = 1.0f / 2;
+						pFade.rotationStart = 0.f;
+						pFade.rotationEnd = 0.f;
+						particleSystem.AddParticle(pFade);
+
+						// Line of rotating particles, created left to right with alarm
+						Core::Particle p;
+						p.pos = _pos;
+						p.velocity = Vector2{ 0, -32 };
+						p.sizeStart = Vector2{ SQUARE_SIZE, SQUARE_SIZE };
+						p.sizeEnd = Vector2{ 0.1, 0.1};
+						p.colorStart = WHITE;
+						p.colorEnd = WHITE;
+						p.age = 0.0f;
+						p.lifetime = 1.0f / 2;
+						p.rotationStart = 0.f;
+						p.rotationEnd = 1.57 * 40;
+						
+						Core::Application::Get().PushAlarm(Core::Alarm([=]() 
+						{
+							particleSystem.AddParticle(p);
+						}, float(x) / GRID_WIDTH / 4));
+
+
 					}
 
 				}
@@ -640,14 +643,23 @@ namespace Tetris
 			score += combo * 4;
 
 			int write_y = GRID_HEIGHT - 1;
+			
+			// In order to prevent any movement while we wait for the grid to be shifted down
+			alarmOngoing = true;
+			Core::Application::Get().PushAlarm(Core::Alarm([=]() {alarmOngoing = false; }, 0.5f / 2));
 
+			// Shift down grid
 			for (int y = GRID_HEIGHT-1; y >= 0; y--)
 			{
 				if (!linesFull[y]) {
 					for (int x = 0; x < GRID_WIDTH; x++)
 					{
-						grid.getSquare(x, write_y) = grid.getSquare(x, y); // i dont think this needs to be 2 for loops
-						grid.getDepth(x, write_y) = grid.getDepth(x, y);
+						Core::Application::Get().PushAlarm(Core::Alarm([=]()
+						{
+							grid.getSquare(x, write_y) = grid.getSquare(x, y); // i dont think this needs to be 2 for loops
+							grid.getDepth(x, write_y) = grid.getDepth(x, y);
+						}, 0.5f / 2 ));
+
 
 
 

@@ -14,6 +14,8 @@ namespace Core
 		for (const auto& p : m_Particles)
 		{
 			float t = p.age / p.lifetime;
+			t = Clamp(t, 0.0, 1.0);
+			//t = 1.0f - powf(1.0f - t, 3.0f);
 			Color c = ColorLerp(p.colorStart, p.colorEnd, t);
 			Vector2 size = Vector2Lerp(p.sizeStart, p.sizeEnd, t);
 			float rot = Lerp(p.rotationStart, p.rotationEnd, t);
