@@ -98,10 +98,48 @@ namespace Core
 		}
 	}
 
+	bool AssetManager::addSound(const std::string& assetName, const std::string& filepath)
+	{
+		// Check if already in the map
+		if (m_SoundMap.find(assetName) != m_SoundMap.end())
+		{
+			std::cout << "Sound already exists at key: " + assetName << std::endl;
+			return false;
+		}
+
+
+		
+		Sound s = LoadSound(filepath.c_str());
+
+		if (s.frameCount == 0)	// Load Failed
+		{
+			std::cout << "Failed to load sound " + assetName << std::endl;
+			return false;
+		}
+
+		m_SoundMap.emplace(assetName, std::make_shared<Sound>(s));
+		return true;
+
+	}
+
+	const Sound& AssetManager::getSound(const std::string& assetName)
+	{
+		auto iterator = m_SoundMap.find(assetName);
+		if (iterator != m_SoundMap.end())
+		{
+			return *iterator->second;
+		}
+		else
+		{
+			return Sound();
+		}
+	}
 
 	AssetManager::~AssetManager()
 	{
 		for (auto t : m_TextureMap)
 			UnloadTexture(*t.second);
+		for (auto s : m_SoundMap)
+			UnloadSound(*s.second);
 	}
 }

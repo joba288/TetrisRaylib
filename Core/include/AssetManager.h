@@ -14,10 +14,13 @@ namespace Core
 			bool addTexture(const std::string& assetName, const std::string& filepath);
 			bool addShader(const std::string& assetName, const std::string& fsFilepath, const std::string& vsFilepath);
 			bool addShaderFromMemory(const std::string& assetName, const std::string& fsText, const std::string& vsText);
+			bool addSound(const std::string& assetName, const std::string& filepath);
 			const Texture& getTexture(const std::string& assetName);
 			const Shader& getShader(const std::string& assetName);
+			const Sound& getSound(const std::string& assetName);
 		private:
 			std::map<std::string, std::shared_ptr<Texture>> m_TextureMap;
 			std::map<std::string, std::shared_ptr<Shader>> m_ShaderMap;
+			std::map<std::string, std::shared_ptr<Sound>> m_SoundMap;
 	};
 }
