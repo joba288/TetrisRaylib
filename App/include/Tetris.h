@@ -194,20 +194,16 @@ namespace Tetris
 			if (!moving && !alarmOngoing)
 			{
 				moving = true;
-				trailStart = currentPos; trailEndY = quickPlacePos.y;
-				trailColor = colors[currentTetronimo];
-				trailRot = currentRotation;
-				trailTetronimo = currentTetronimo;
+
 
 				placeAlarm = Core::Application::Get().PushAlarm(Core::Alarm([this]()
 				{
+					trailStart = currentPos; trailEndY = quickPlacePos.y;
+					trailColor = colors[currentTetronimo];
+					trailRot = currentRotation;
+					trailTetronimo = currentTetronimo;
 					currentPos = quickPlacePos;
 					placeCurrentTetronimo();
-<<<<<<< HEAD
-					moving = false;
-				},0.03f
-					));
-=======
 
 
 
@@ -215,7 +211,6 @@ namespace Tetris
 					moving = false;
 				}, 0.03f
 				));
->>>>>>> c92df9d (current changes)
 			}
 			
 		}
@@ -512,7 +507,7 @@ namespace Tetris
 
 		void placeCurrentTetronimo()
 		{
-			
+			PlaySound(Core::Application::Get().GetAssetManager().getSound("Place"));
 			for (int y = 0; y < 4; y++)
 			{
 				for (int x = 0; x < 4; x++)
@@ -544,7 +539,10 @@ namespace Tetris
 			quickPlacePos = getLandingPosition();
 
 			if (checkCollision(currentPos))
+			{
+				PlaySound(Core::Application::Get().GetAssetManager().getSound("Fail"));
 				gameOver = true;
+			}
 			
 		}
 
@@ -559,7 +557,10 @@ namespace Tetris
 			quickPlacePos = getLandingPosition();
 
 			if (checkCollision(currentPos))
+			{
+				PlaySound(Core::Application::Get().GetAssetManager().getSound("Fail"));
 				gameOver = true;
+			}
 		}
 
 		ivec2 getLandingPosition()
@@ -603,7 +604,7 @@ namespace Tetris
 				{
 					linesFull[y] = true;
 					combo++;
-
+					PlaySound(Core::Application::Get().GetAssetManager().getSound("LineComplete"));
 					for (int x = 0; x < GRID_WIDTH; x++)
 					{
 						Vector2 _pos = Vector2{ (float)(x + grid.pos.x + 0.5f) * SQUARE_SIZE, float(y + 1 - 0.5f) * SQUARE_SIZE };
@@ -656,6 +657,9 @@ namespace Tetris
 				}
 				
 			}
+
+			
+				
 
 			score += combo * 4;
 

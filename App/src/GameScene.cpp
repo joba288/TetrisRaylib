@@ -17,7 +17,7 @@ namespace Tetris
 
 	void GameScene::Init()
 	{
-
+		
 		m_Tetris = Tetris();
 		m_Tetris.grid.initDepthGrid();
 
@@ -128,7 +128,7 @@ namespace Tetris
 			m_Tetris.drawTrail(renderer);
 		EndShaderMode();
 
-		BeginShaderMode(spinShader);
+		BeginShaderMode(pulsateShader);
 
 		float scale = .75f;
 
@@ -144,7 +144,7 @@ namespace Tetris
 			pos.y + blockSize * 2.0f
 		};
 
-		SetShaderValue(spinShader, centreLoc, &centre, SHADER_UNIFORM_VEC2);
+		SetShaderValue(pulsateShader, pulsate_centreLoc, &centre, SHADER_UNIFORM_VEC2);
 		
 
 		m_Tetris.drawUpcomingTetronimo(
@@ -161,7 +161,7 @@ namespace Tetris
 		EndShaderMode();
 		m_Tetris.getParticleSystem().DrawParticles();
 
-		BeginShaderMode(spinShader);
+		BeginShaderMode(pulsateShader);
 		scale = .75f;
 
 		pos = {
@@ -176,7 +176,7 @@ namespace Tetris
 			pos.y + blockSize * 2.0f
 		};
 
-		SetShaderValue(spinShader, centreLoc, &centre, SHADER_UNIFORM_VEC2);
+		SetShaderValue(pulsateShader, pulsate_centreLoc, &centre, SHADER_UNIFORM_VEC2);
 		m_Tetris.drawUpcomingTetronimo(
 			renderer,
 			2,
@@ -208,8 +208,6 @@ namespace Tetris
 			0.0f);
 		EndShaderMode();
 		
-
-		
 		EndMode2D();
 
 		 
@@ -225,6 +223,8 @@ namespace Tetris
 	{
 		m_Tetris.getParticleSystem().OnUpdate(ts);
 		m_UISystem.OnUpdate(ts);
+
+		
 
 		time += ts;
 		m_Tetris.Tick(ts);
@@ -255,6 +255,7 @@ namespace Tetris
 			Core::Application::Get().PushAlarm(Core::Alarm([this]() {
 				setCameraShake(2,0.25f);
 				timePlaced = time;
+				
 			}, 0.03f));
 
 

@@ -15,8 +15,11 @@ int main()
     application.GetSceneManager().AddSceneToSequence<Tetris::GameScene>();
     application.GetSceneManager().AddSceneToSequence<Tetris::DeathScene>();
 
-
+    InitAudioDevice(); // Todo Sound manager
     application.addTexture("Block", "resources/squareTexture.jpg");
+    application.GetAssetManager().addSound("Place", "resources/snPlace.wav");
+    application.GetAssetManager().addSound("LineComplete", "resources/snLineComplete.wav");
+    application.GetAssetManager().addSound("Fail", "resources/snFail.wav");
     application.GetAssetManager().addShader("Spin", "resources/vsSpin.glsl", "resources/fsBase.glsl");
     application.GetAssetManager().addShader("Trail", "resources/vsBase.glsl", "resources/fsTrail.glsl");
     application.GetAssetManager().addShader("Pulsate", "resources/vsPulsate.glsl", "resources/fsBase.glsl");
@@ -25,4 +28,5 @@ int main()
 
     application.GotoScene(1);
     application.Run();
+    CloseAudioDevice();
 }
