@@ -152,7 +152,9 @@ namespace Tetris
 			1,
 			pos.x / SQUARE_SIZE,
 			pos.y / SQUARE_SIZE,
-			scale
+
+			scale,
+			0.0f
 		);
 
 		
@@ -180,7 +182,8 @@ namespace Tetris
 			2,
 			pos.x / SQUARE_SIZE,
 			pos.y / SQUARE_SIZE,
-			scale
+			scale,
+			0.0f
 		);
 		EndShaderMode();
 
@@ -201,7 +204,8 @@ namespace Tetris
 			pos.y + blockSize * 2.0f
 		};
 		SetShaderValue(pulsateShader, pulsate_centreLoc, &centre, SHADER_UNIFORM_VEC2);
-		m_Tetris.drawSavedTetronimo(renderer, pos.x/SQUARE_SIZE, pos.y/SQUARE_SIZE, scale);
+		m_Tetris.drawSavedTetronimo(renderer, pos.x/SQUARE_SIZE, pos.y/SQUARE_SIZE, scale,
+			0.0f);
 		EndShaderMode();
 		
 

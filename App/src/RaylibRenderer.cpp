@@ -6,15 +6,26 @@
 
 typedef unsigned int uint;
 
-void Tetris::RaylibRenderer::drawRectangle(int x, int y, int w, int h, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+void Tetris::RaylibRenderer::drawRectangle(int x, int y, int w, int h, float rot, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 {
-    DrawRectangle(x, y, w, h,
-        Color{
-            (unsigned char)r,
-            (unsigned char)g,
-            (unsigned char)b,
-            (unsigned char)a
-        });
+
+    Vector2 origin{ w / 2.0f, h / 2.0f };
+
+    Rectangle rec{
+        x + origin.x,
+        y + origin.y,
+        w,
+        h
+    };
+
+    DrawRectanglePro(
+        rec,
+        origin,
+        rot,
+        Color{ r,g,b,a }
+    );
+
+    
 }
 
 void Tetris::RaylibRenderer::drawText(const char* text, int x, int y, int size, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
@@ -28,7 +39,7 @@ void Tetris::RaylibRenderer::drawText(const char* text, int x, int y, int size, 
         });
 }
 
-void Tetris::RaylibRenderer::drawTexture(int x, int y, float scale, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+void Tetris::RaylibRenderer::drawTexture(int x, int y, float scale, float rot, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 {
     
     float w = tex.width * scale;
@@ -50,13 +61,13 @@ void Tetris::RaylibRenderer::drawTexture(int x, int y, float scale, unsigned cha
         source,
         dest,
         origin,
-        0.0f,
+        rot,
         Color{ r,g,b,a }
     );
     
 }
 
-void Tetris::RaylibRenderer::drawTexture(int x, int y, int w, int h, float scale, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+void Tetris::RaylibRenderer::drawTexture(int x, int y, int w, int h, float scale, float rot, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 {
 
     float width = w * scale;
@@ -78,7 +89,7 @@ void Tetris::RaylibRenderer::drawTexture(int x, int y, int w, int h, float scale
         source,
         dest,
         origin,
-        0.0f,
+        rot,
         Color{ r,g,b,a }
     );
 

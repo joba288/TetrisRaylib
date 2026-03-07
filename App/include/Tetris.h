@@ -203,9 +203,19 @@ namespace Tetris
 				{
 					currentPos = quickPlacePos;
 					placeCurrentTetronimo();
+<<<<<<< HEAD
 					moving = false;
 				},0.03f
 					));
+=======
+
+
+
+
+					moving = false;
+				}, 0.03f
+				));
+>>>>>>> c92df9d (current changes)
 			}
 			
 		}
@@ -256,9 +266,9 @@ namespace Tetris
 					int currentSquare = grid.getSquare(x, y);
 					Color c = colors[currentSquare]; // Replace color
 					if (currentSquare == 0)
-						r.drawRectangle(x * SQUARE_SIZE, y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, c.r, c.g, c.b, c.a);
+						r.drawRectangle(x * SQUARE_SIZE, y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, 0.0f, c.r, c.g, c.b, c.a);
 					else
-						r.drawTexture(x * SQUARE_SIZE, y * SQUARE_SIZE, 1, c.r, c.g, c.b, c.a);
+						r.drawTexture(x * SQUARE_SIZE, y * SQUARE_SIZE, 1,0, c.r, c.g, c.b, c.a);
 				}
 			}
 		}
@@ -273,20 +283,7 @@ namespace Tetris
 			minPos = { 4,4 };
 			maxPos = { -1,-1 };
 
-			for (int y = 0; y < 4; y++)
-			{
-				for (int x = 0; x < 4; x++)
-				{
-					int currentSquare = tetronimos[TETRONIMO_INDEX(currentTetronimo, currentRotation, x, y)]; // TODO Cache this somewhere
-					if (currentSquare != 0)
-					{
-						if (x < minPos.x) minPos.x = x;
-						if (y < minPos.y) minPos.y = y;
-						if (x > maxPos.x) maxPos.x = x;
-						if (y > maxPos.y) maxPos.y = y;
-					}
-				}
-			}
+			calculateTetronimoMinMax(minPos, maxPos, currentTetronimo, currentRotation);
 			
 			int tetronimoWidth = maxPos.x - minPos.x + 1;
 			int tetronimoHeight = maxPos.y - minPos.y + 1;
@@ -334,27 +331,31 @@ namespace Tetris
 							drawY,
 							w * SQUARE_SIZE + 1,
 							h * SQUARE_SIZE + 1,
-							1, c.r, c.g, c.b, c.a);
+							1,0, c.r, c.g, c.b, c.a);
 						// Landing pos
 						r.drawTexture(drawX,
 									  y * SQUARE_SIZE + quickPlacePos.y * SQUARE_SIZE, w * SQUARE_SIZE+1, SQUARE_SIZE,
-							          1, c.r, c.g, c.b, 125);					
+							          1,0, c.r, c.g, c.b, 125);					
 					}
 				}
 			}
 
 		}
-		void drawUpcomingTetronimo(Core::RendererAdapter& r, unsigned int i, int posX, int posY, float scale)
+		TETRONIMO getUpcomingTetronimo(int i)
+		{
+			return upcomingTetronimos[(currentTetronimoIndex + i) % 3];
+		}
+		void drawUpcomingTetronimo(Core::RendererAdapter& r, unsigned int i, int posX, int posY, float scale, float rot)
 		{
 			TETRONIMO t = upcomingTetronimos[(currentTetronimoIndex + i) % 3];
-			drawGUITetronimo(r, t, posX, posY, scale);
+			drawGUITetronimo(r, t, posX, posY, scale, rot);
 		}
-		void drawSavedTetronimo(Core::RendererAdapter& r, int posX, int posY, float scale)
+		void drawSavedTetronimo(Core::RendererAdapter& r, int posX, int posY, float scale, float rot)
 		{
 			if (savedTetronimo != 0)
-				drawGUITetronimo(r, savedTetronimo, posX, posY, scale);
+				drawGUITetronimo(r, savedTetronimo, posX, posY, scale, rot);
 		}
-		void drawGUITetronimo(Core::RendererAdapter& r, TETRONIMO t, int posX, int posY, float scale)
+		void drawGUITetronimo(Core::RendererAdapter& r, TETRONIMO t, int posX, int posY, float scale, float rot)
 		{
 			float sSize = SQUARE_SIZE * scale;
 
@@ -372,12 +373,12 @@ namespace Tetris
 					float py = baseY + y * sSize;
 
 					if (currentSquare == 0)
-					{}
-						//r.drawRectangle(px, py, sSize, sSize, c.r, c.g, c.b, c.a);
-						
+					{
+						//r.drawRectangle(px, py, sSize, sSize, 0.0, c.r, c.g, c.b, c.a);
+					}
 					else
 					{
-						r.drawTexture(px, py, scale, c.r, c.g, c.b, 255);
+						r.drawTexture(px, py, scale, rot, c.r, c.g, c.b, 255);
 
 						// Check neighbors
 						auto get = [&](int nx, int ny)
@@ -391,19 +392,19 @@ namespace Tetris
 
 						// Top
 						if (get(x, y - 1) == 0)
-							r.drawRectangle(px - outline, py - outline, sSize + outline * 2, outline, 255, 255, 255, 255);
+							r.drawRectangle(px - outline, py - outline, sSize + outline * 2, outline, 0.0f, 255, 255, 255, 255);
 
 						// Bottom
 						if (get(x, y + 1) == 0)
-							r.drawRectangle(px - outline, py + sSize, sSize + outline * 2, outline, 255, 255, 255, 255);
+							r.drawRectangle(px - outline, py + sSize, sSize + outline * 2, outline, 0.0f, 255, 255, 255, 255);
 
 						// Left
 						if (get(x - 1, y) == 0)
-							r.drawRectangle(px - outline, py, outline, sSize, 255, 255, 255, 255);
+							r.drawRectangle(px - outline, py, outline, sSize, 0.0f, 255, 255, 255, 255);
 
 						// Right
 						if (get(x + 1, y) == 0)
-							r.drawRectangle(px + sSize, py, outline, sSize, 255, 255, 255, 255);
+							r.drawRectangle(px + sSize, py, outline, sSize, 0.0f, 255, 255, 255, 255);
 					
 					}
 				}
@@ -422,20 +423,7 @@ namespace Tetris
 			minPos = { 4,4 };
 			maxPos = { -1,-1 };
 
-			for (int y = 0; y < 4; y++)
-			{
-				for (int x = 0; x < 4; x++)
-				{
-					int currentSquare = tetronimos[TETRONIMO_INDEX(trailTetronimo, trailRot, x, y)]; // TODO Cache this somewhere
-					if (currentSquare != 0)
-					{
-						if (x < minPos.x) minPos.x = x;
-						if (y < minPos.y) minPos.y = y;
-						if (x > maxPos.x) maxPos.x = x;
-						if (y > maxPos.y) maxPos.y = y;
-					}
-				}
-			}
+			calculateTetronimoMinMax(minPos, maxPos, trailTetronimo, trailRot);
 
 			minPos.x += trailStart.x;
 			minPos.y += trailStart.y;
@@ -446,9 +434,38 @@ namespace Tetris
 				minPos.x * SQUARE_SIZE,
 				minPos.y * SQUARE_SIZE,
 				(maxPos.x - minPos.x + 1) * SQUARE_SIZE,
-				(trailEndY - minPos.y + 2) * SQUARE_SIZE, c.r, c.g, c.b, c.a);
+				(trailEndY - minPos.y + 2) * SQUARE_SIZE, 0.0f, c.r, c.g, c.b, c.a);
 		}
 		//
+
+		void calculateTetronimoMinMax(Vector2& min, Vector2& max, TETRONIMO t, int rot)
+		{
+			// TODO : Cache this for every tetronimo, every rotation - only needs to be done once and then can be saved
+			min = { 4,4 };
+			max = { -1,-1 };
+
+			for (int y = 0; y < 4; y++)
+			{
+				for (int x = 0; x < 4; x++)
+				{
+					int currentSquare = tetronimos[TETRONIMO_INDEX(t, rot, x, y)]; // TODO Cache this somewhere
+					if (currentSquare != 0)
+					{
+						if (x < min.x) min.x = x;
+						if (y < min.y) min.y = y;
+						if (x > max.x) max.x = x;
+						if (y > max.y) max.y = y;
+					}
+				}
+			}
+		}
+
+		Vector2 calculateTetronimoCentre(Vector2 min, Vector2 max)
+		{
+			return { float(min.x + max.x + 1) / 2.0f, float(min.y + max.y + 1) / 2.0f };
+		}
+
+
 
 		void combineGridTetronimoDepth(std::array<float, (GRID_WIDTH*GRID_HEIGHT)>& result)
 		{

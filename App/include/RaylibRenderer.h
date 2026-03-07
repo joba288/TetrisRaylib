@@ -8,10 +8,10 @@ namespace Tetris
 	{
 		public:
 			RaylibRenderer() {};
-			virtual void drawRectangle(int x, int y, int w, int h, unsigned char r, unsigned char g, unsigned char b, unsigned char a) override;
+			virtual void drawRectangle(int x, int y, int w, int h, float rot, unsigned char r, unsigned char g, unsigned char b, unsigned char a) override;
 			virtual void drawText(const char* text, int x, int y, int size, unsigned char r, unsigned char g, unsigned char b, unsigned char a) override;
-			virtual void drawTexture(int x, int y, float scale, unsigned char r, unsigned char g, unsigned char b, unsigned char a) override;
-			virtual void drawTexture(int x, int y, int w, int h, float scale, unsigned char r, unsigned char g, unsigned char b, unsigned char a) override;
+			virtual void drawTexture(int x, int y, float scale, float rot, unsigned char r, unsigned char g, unsigned char b, unsigned char a) override;
+			virtual void drawTexture(int x, int y, int w, int h, float scale,float rot, unsigned char r, unsigned char g, unsigned char b, unsigned char a) override;
 
 			virtual void LoadTexture(const std::string& assetName) override;
 
