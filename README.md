@@ -1,5 +1,6 @@
 # Tetris in Raylib
-A remake of the game Tetris with C++ and the raylib library
+<p>A remake of the game Tetris with C++ and the raylib library</p>
+<img width="351" height="357" alt="image" src="https://github.com/user-attachments/assets/18887b3c-cdbf-4634-8f0e-5679a397cbc6" />
 
 
 ## Build (Cmake)
