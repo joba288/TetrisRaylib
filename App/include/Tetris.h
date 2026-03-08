@@ -18,18 +18,6 @@
 // make it independent to raylib
 
 
-// TODO:
-//
-//  GAMEPLAY
-// - Speeding up of interval - difficulty
-// - Saving Tetronimos Fix
-// 
-// POLISH
-
-// - Music
-// - SFX
-// - Animation
-// - trail when quick place
 
 
 
@@ -341,7 +329,8 @@ namespace Tetris
 							h * SQUARE_SIZE + 1,
 							1,0, c.r, c.g, c.b, c.a);
 						// Landing pos
-						r.drawTexture(drawX,
+						if (!alarmOngoing) 
+							r.drawTexture(drawX,
 									  y * SQUARE_SIZE + quickPlacePos.y * SQUARE_SIZE, w * SQUARE_SIZE+1, SQUARE_SIZE,
 							          1,0, c.r, c.g, c.b, 125);					
 					}
@@ -736,9 +725,11 @@ namespace Tetris
 			int write_y = GRID_HEIGHT - 1;
 			
 			// In order to prevent any movement while we wait for the grid to be shifted down
-			alarmOngoing = true;
-			Core::Application::Get().PushAlarm(Core::Alarm([=]() {alarmOngoing = false; }, 0.5f / 2));
-
+			if (combo != 0)
+			{
+				alarmOngoing = true;
+				Core::Application::Get().PushAlarm(Core::Alarm([=]() {alarmOngoing = false; }, 0.3f));
+			}
 			// Shift down grid
 			for (int y = GRID_HEIGHT-1; y >= 0; y--)
 			{
