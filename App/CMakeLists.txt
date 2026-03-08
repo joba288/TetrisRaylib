@@ -4,4 +4,10 @@ add_executable(App src/main.cpp "include/MenuScene.h" "src/MenuScene.cpp" "inclu
 target_include_directories(App PRIVATE include)
 target_link_libraries(App PRIVATE Core)
 
-file(COPY "resources" DESTINATION "${CMAKE_BINARY_DIR}/App")
+set(RESOURCES_DIR ${CMAKE_SOURCE_DIR}/resources)
+
+add_custom_command(TARGET App POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${RESOURCES_DIR}
+    $<TARGET_FILE_DIR:App>/resources
+)
