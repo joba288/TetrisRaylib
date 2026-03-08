@@ -110,6 +110,7 @@ namespace Tetris
 		bool moving = false;
 		bool alarmOngoing = false;
 		
+		bool unsaved = false;
 
 
 		
@@ -224,15 +225,19 @@ namespace Tetris
 		}
 		void onInputSaveTetronimoPressed()
 		{
-			if (savedTetronimo == 0) // None Saved
+			if (unsaved == false) // To prevent multiple saves of the same piece
 			{
-				savedTetronimo = currentTetronimo;
-				initNextTetronimo();
-			}
-			else                     // Tetronimo Already Saved
-			{
-				initNextTetronimo(savedTetronimo);
-				savedTetronimo = TETRONIMO(0);
+				if (savedTetronimo == 0) // None Saved
+				{
+					savedTetronimo = currentTetronimo;
+					initNextTetronimo();
+				}
+				else                     // Tetronimo Already Saved
+				{
+					initNextTetronimo(savedTetronimo);
+					savedTetronimo = TETRONIMO(0);
+					unsaved = true;
+				}
 			}
 		}
 		void Tick(float ts) 
@@ -601,6 +606,9 @@ namespace Tetris
 				PlaySound(Core::Application::Get().GetAssetManager().getSound("Fail"));
 				gameOver = true;
 			}
+
+			if (unsaved)
+				unsaved = false;
 			
 		}
 
@@ -620,6 +628,9 @@ namespace Tetris
 				PlaySound(Core::Application::Get().GetAssetManager().getSound("Fail"));
 				gameOver = true;
 			}
+
+			if (unsaved)
+				unsaved = false;
 		}
 
 		ivec2 getLandingPosition()
