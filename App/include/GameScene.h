@@ -20,6 +20,7 @@ namespace Tetris {
 		void shakeCamera(float ts);
 
 	private:
+		void DrawPanel(int x, int y, int w, int h);
 		Tetris m_Tetris;
 		Core::UISystem m_UISystem;
 		Camera2D m_Camera = { 0 };

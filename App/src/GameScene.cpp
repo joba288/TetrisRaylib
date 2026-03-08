@@ -92,9 +92,10 @@ namespace Tetris
 	
 	void GameScene::OnRender()
 	{
-		ClearBackground(DARKGRAY);
+		ClearBackground(Color{ 62, 59,101,255 });
 
-		float mouseUV[2] = { GetMouseX(), GetMouseY() };		
+		//float mouseUV[2] = { GetMouseX(), GetMouseY() };	
+		float mouseUV[2] = {0.0f, 0.0f};
 
 		SetShaderValueV(lightingShader, depthGridLoc, gridAndCurrentDepth.data(), SHADER_UNIFORM_FLOAT, GRID_WIDTH * GRID_HEIGHT);
 		SetShaderValue(lightingShader, screenSizeLoc, &screenSize, SHADER_UNIFORM_VEC2);
@@ -128,13 +129,20 @@ namespace Tetris
 			m_Tetris.drawTrail(renderer);
 		EndShaderMode();
 
+
+		m_Tetris.drawGridOutline(renderer);
+
+		
+
+		DrawPanel(11 * SQUARE_SIZE , 1 * SQUARE_SIZE, 4 * SQUARE_SIZE, 4 * SQUARE_SIZE);
+		
 		BeginShaderMode(pulsateShader);
 
-		float scale = .75f;
+		float scale = .65f;
 
 		Vector2 pos = {
-			11 * SQUARE_SIZE,
-			1 * SQUARE_SIZE
+			12 * SQUARE_SIZE,
+			2 * SQUARE_SIZE
 		};
 
 		float blockSize = SQUARE_SIZE * scale;
@@ -159,14 +167,18 @@ namespace Tetris
 
 		
 		EndShaderMode();
+		DrawText("Next: ", 11 * SQUARE_SIZE, 0 * SQUARE_SIZE, 30, WHITE);
+
 		m_Tetris.getParticleSystem().DrawParticles();
 
+		
+		DrawPanel(11 * SQUARE_SIZE, 6 * SQUARE_SIZE, 4 * SQUARE_SIZE, 4 * SQUARE_SIZE);
 		BeginShaderMode(pulsateShader);
-		scale = .75f;
+		scale = .65f;
 
 		pos = {
-			11 * SQUARE_SIZE,
-			5 * SQUARE_SIZE
+			12 * SQUARE_SIZE,
+			7 * SQUARE_SIZE
 		};
 		
 
@@ -187,14 +199,14 @@ namespace Tetris
 		);
 		EndShaderMode();
 
-
-
+		
+		DrawPanel(-5 * SQUARE_SIZE, 1 * SQUARE_SIZE, 4 * SQUARE_SIZE, 4 * SQUARE_SIZE);
 		BeginShaderMode(pulsateShader);
-		scale = .75f;
+		scale = .65f;
 
 		pos = {
-			-4 * SQUARE_SIZE,
-			17 * SQUARE_SIZE
+			-5 * SQUARE_SIZE,
+			2 * SQUARE_SIZE
 		};
 
 
@@ -207,13 +219,17 @@ namespace Tetris
 		m_Tetris.drawSavedTetronimo(renderer, pos.x/SQUARE_SIZE, pos.y/SQUARE_SIZE, scale,
 			0.0f);
 		EndShaderMode();
-		
+
+		DrawText("Score: ", -5 * SQUARE_SIZE, 6 * SQUARE_SIZE, 30, WHITE);
+		m_Tetris.drawScore(renderer, -5 * SQUARE_SIZE, 7 * SQUARE_SIZE);
+		DrawText("Saved: ", -5 * SQUARE_SIZE, 0 * SQUARE_SIZE, 30, WHITE);
+
 		EndMode2D();
 
 		 
 		
 		//GUI
-		m_Tetris.drawScore(renderer);
+		
 		//DrawText(std::to_string(m_ShakeTime).c_str(), 100, 100, 64, BLACK);
 		m_UISystem.Draw();
 
@@ -303,4 +319,11 @@ namespace Tetris
 	GameScene::GameScene() {}
 	GameScene::~GameScene() {}
 
+
+	void GameScene::DrawPanel(int x, int y, int w, int h)
+	{
+		Rectangle r = { (float)x, (float)y, (float)w, (float)h };
+		DrawRectangleRec(r, Color{ 16,18,28,255 });
+		DrawRectangleLinesEx(r, 3.0f, WHITE);
+	}
 }

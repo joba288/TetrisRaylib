@@ -128,7 +128,14 @@ namespace Tetris
 
 	
 
-		std::array<Color, 8> colors = {GRAY, SKYBLUE, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED};
+		std::array<Color, 8> colors = { Color{ 56, 89,179,255}, // DARKBLUE
+										Color { 54,197,244,255},// SKYBLUE
+										Color { 51,136,222,255},// BLUE
+										Color {233,133, 55,255},//ORANGE
+										GOLD,// YELLOW
+										Color {157,230, 78,255}, // LIME
+										Color {204,153,255,255}, // VIOLET
+										Color {236, 39, 63,255} }; // RED
 
 		Color trailColor = colors[currentTetronimo];
 
@@ -189,6 +196,7 @@ namespace Tetris
 				}
 			}
 		}
+
 		void onInputSpeedPlacePressed()
 		{
 			if (!moving && !alarmOngoing)
@@ -383,7 +391,7 @@ namespace Tetris
 							return tetronimos[TETRONIMO_INDEX(t, 1, nx, ny)];
 						};
 
-						float outline = 4.0f;
+						float outline = 2.0f;
 
 						// Top
 						if (get(x, y - 1) == 0)
@@ -406,9 +414,9 @@ namespace Tetris
 			}
 		}
 
-		void drawScore(Core::RendererAdapter& r)
+		void drawScore(Core::RendererAdapter& r, int x, int y)
 		{
-			r.drawText(std::to_string(score).c_str(), 20, 10, 80, 0, 0, 0, 255);
+			r.drawText(std::to_string(score).c_str(), x, y, 64, 255, 255, 255, 255);
 		}
 		void drawTrail(Core::RendererAdapter& r)
 		{
@@ -431,6 +439,55 @@ namespace Tetris
 				(maxPos.x - minPos.x + 1) * SQUARE_SIZE,
 				(trailEndY - minPos.y + 2) * SQUARE_SIZE, 0.0f, c.r, c.g, c.b, c.a);
 		}
+
+		void drawGridOutline(Core::RendererAdapter& r)
+		{
+			int outlineWidth = 2;
+
+			int gridWidthPixels = GRID_WIDTH * SQUARE_SIZE;
+			int gridHeightPixels = GRID_HEIGHT * SQUARE_SIZE;
+
+			int x = grid.pos.x * SQUARE_SIZE;
+			int y = grid.pos.y * SQUARE_SIZE;
+
+			// Top
+			Rectangle top = {
+				(float)(x - outlineWidth),
+				(float)(y - outlineWidth),
+				(float)(gridWidthPixels + outlineWidth * 2),
+				(float)outlineWidth
+			};
+
+			// Bottom
+			Rectangle bottom = {
+				(float)(x - outlineWidth),
+				(float)(y + gridHeightPixels),
+				(float)(gridWidthPixels + outlineWidth * 2),
+				(float)outlineWidth
+			};
+
+			// Left
+			Rectangle left = {
+				(float)(x - outlineWidth),
+				(float)(y),
+				(float)outlineWidth,
+				(float)(gridHeightPixels)
+			};
+
+			// Right
+			Rectangle right = {
+				(float)(x + gridWidthPixels),
+				(float)(y),
+				(float)outlineWidth,
+				(float)(gridHeightPixels)
+			};
+
+			DrawRectangleRec(top, WHITE);
+			DrawRectangleRec(bottom, WHITE);
+			DrawRectangleRec(left, WHITE);
+			DrawRectangleRec(right, WHITE);
+		}
+
 		//
 
 		void calculateTetronimoMinMax(Vector2& min, Vector2& max, TETRONIMO t, int rot)
@@ -533,6 +590,7 @@ namespace Tetris
 			currentPos = { 3, 0 };
 			currentRotation = 0;
 			currentDepth = (rand() % 64 + 2) / 2;
+			currentDepth = 2;
 			currentTetronimoIndex = ((currentTetronimoIndex + 1) % 3);				   //   increment index position for the next tetronimo
 			currentTetronimo = upcomingTetronimos[currentTetronimoIndex]; //				set the next tetronimo as current
 			upcomingTetronimos[currentTetronimoIndex] = TETRONIMO(rand() % (7) + 1); //		get new random tetronimo
@@ -551,6 +609,7 @@ namespace Tetris
 			currentPos = { 3, 0 };
 			currentRotation = 0;
 			currentDepth = (rand() % 64 + 2) / 2;
+			currentDepth = 2;
 			currentTetronimoIndex = ((currentTetronimoIndex + 1) % 3);				   //   increment index position for the next tetronimo
 			currentTetronimo = t; //				set the next tetronimo as current
 			upcomingTetronimos[currentTetronimoIndex] = TETRONIMO(rand() % (7) + 1); //		get new random tetronimo

@@ -20,13 +20,15 @@ int main()
     application.GetAssetManager().addSound("Place", "resources/snPlace.wav");
     application.GetAssetManager().addSound("LineComplete", "resources/snLineComplete.wav");
     application.GetAssetManager().addSound("Fail", "resources/snFail.wav");
+    //application.GetAssetManager().addSound("Music", "resources/snMusic.wav");
+    //PlaySound(application.GetAssetManager().getSound("Music"));
     application.GetAssetManager().addShader("Spin", "resources/vsSpin.glsl", "resources/fsBase.glsl");
     application.GetAssetManager().addShader("Trail", "resources/vsBase.glsl", "resources/fsTrail.glsl");
     application.GetAssetManager().addShader("Pulsate", "resources/vsPulsate.glsl", "resources/fsBase.glsl");
 
 
 
-    application.GotoScene(1);
+    application.GotoScene(0);
     application.Run();
     CloseAudioDevice();
 }
